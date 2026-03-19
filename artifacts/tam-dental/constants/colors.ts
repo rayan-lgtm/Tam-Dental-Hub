@@ -1,8 +1,8 @@
-const PRIMARY = "#0A5F7A";
-const PRIMARY_LIGHT = "#1A8FAD";
-const PRIMARY_DARK = "#073D50";
-const ACCENT = "#00C4B4";
-const ACCENT_LIGHT = "#4DD9CE";
+const PRIMARY = "#1691D0";
+const PRIMARY_LIGHT = "#87B3D4";
+const PRIMARY_DARK = "#0d7bbf";
+const ACCENT = "#1691D0";
+const ACCENT_LIGHT = "#D0E8F5";
 
 export const Colors = {
   primary: PRIMARY,
@@ -11,13 +11,13 @@ export const Colors = {
   accent: ACCENT,
   accentLight: ACCENT_LIGHT,
 
-  background: "#F5F8FA",
+  background: "#F4F8FC",
   backgroundCard: "#FFFFFF",
-  backgroundMuted: "#EEF2F5",
+  backgroundMuted: "#EEF6FB",
 
   text: "#0D1B2A",
-  textSecondary: "#5A7184",
-  textMuted: "#9BAEC1",
+  textSecondary: "#6F7374",
+  textMuted: "#87B3D4",
   textInverse: "#FFFFFF",
 
   success: "#16A34A",
@@ -29,11 +29,11 @@ export const Colors = {
   info: "#2563EB",
   infoLight: "#DBEAFE",
 
-  border: "#DDE5ED",
-  borderLight: "#EEF2F5",
+  border: "#C8DDF0",
+  borderLight: "#E0EDF7",
 
   tabActive: PRIMARY,
-  tabInactive: "#9BAEC1",
+  tabInactive: "#87B3D4",
 };
 
-export default { light: { tint: PRIMARY, text: "#0D1B2A", background: "#F5F8FA", tabIconDefault: "#9BAEC1", tabIconSelected: PRIMARY } };
+export default { light: { tint: PRIMARY, text: "#0D1B2A", background: "#F4F8FC", tabIconDefault: "#87B3D4", tabIconSelected: PRIMARY } };

@@ -1,4 +1,4 @@
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { Redirect } from "expo-router";
@@ -116,9 +116,10 @@ export default function LoginScreen() {
         style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) + 20 }]}
       >
         <View style={styles.logoRow}>
-          <View style={styles.logoIconBox}>
-            <MaterialCommunityIcons name="tooth-outline" size={30} color={L.primary} />
-          </View>
+          <Image
+            source={require("@/assets/images/icon.png")}
+            style={styles.logoIconBox}
+          />
           <View>
             <Text style={styles.logoName}>TAM Dental</Text>
             <Text style={styles.logoNameAr}>عيادات تام للأسنان</Text>
@@ -313,16 +314,13 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   logoIconBox: {
-    width: 54,
-    height: 54,
+    width: 58,
+    height: 58,
     borderRadius: 16,
-    backgroundColor: L.white,
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 4,
+    elevation: 6,
     shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
   },
   logoName: {

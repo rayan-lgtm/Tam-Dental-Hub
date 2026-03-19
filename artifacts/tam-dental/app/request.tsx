@@ -30,7 +30,7 @@ export default function RequestScreen() {
     { id: "radiograph", label: t.reqRadiograph, icon: "radiobox-marked", description: t.reqRadiographDesc, color: Colors.info, bg: Colors.infoLight },
     { id: "sick_leave", label: t.reqSickLeave, icon: "file-medical-outline", description: t.reqSickLeaveDesc, color: Colors.success, bg: Colors.successLight },
     { id: "report", label: t.reqReport, icon: "file-chart-outline", description: t.reqReportDesc, color: Colors.primary, bg: "#EEF6FB" },
-    { id: "referral", label: t.reqReferral, icon: "email-send-outline", description: t.reqReferralDesc, color: Colors.accent, bg: "#E0F9F7" },
+    { id: "referral", label: t.reqReferral, icon: "email-send-outline", description: t.reqReferralDesc, color: Colors.primary, bg: Colors.backgroundMuted },
     { id: "treatment_plan", label: t.reqTreatmentPlan, icon: "clipboard-list-outline", description: t.reqTreatmentPlanDesc, color: Colors.warning, bg: Colors.warningLight },
     { id: "other", label: t.reqOther, icon: "dots-horizontal-circle-outline", description: t.reqOtherDesc, color: Colors.textSecondary, bg: Colors.backgroundMuted },
   ];
