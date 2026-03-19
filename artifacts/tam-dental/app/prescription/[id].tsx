@@ -13,20 +13,24 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 import { useAppContext } from "@/context/AppContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function PrescriptionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { prescriptions } = useAppContext();
+  const { t, language } = useLanguage();
   const rx = prescriptions.find((p) => p.id === id);
 
   if (!rx) {
     return (
       <View style={styles.container}>
-        <Text style={styles.notFound}>Prescription not found</Text>
+        <Text style={styles.notFound}>{t.error}</Text>
       </View>
     );
   }
+
+  const locale = language === "ar" ? "ar-SA" : "en-US";
 
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
@@ -34,7 +38,7 @@ export default function PrescriptionScreen() {
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
           <Feather name="arrow-left" size={22} color={Colors.text} />
         </Pressable>
-        <Text style={styles.headerTitle}>Prescription</Text>
+        <Text style={styles.headerTitle}>{t.prescriptions}</Text>
         <View style={styles.backBtn} />
       </View>
 
@@ -47,14 +51,14 @@ export default function PrescriptionScreen() {
           <View style={styles.clinicTop}>
             <View>
               <Text style={styles.clinicName}>TAM Dental Clinic</Text>
-              <Text style={styles.clinicSub}>Licensed Dental Practice • KSA</Text>
+              <Text style={styles.clinicSub}>{t.clinicSubtitle}</Text>
             </View>
             <MaterialCommunityIcons name="prescription" size={36} color="rgba(255,255,255,0.7)" />
           </View>
           <View style={styles.clinicMeta}>
             <Text style={styles.clinicMetaText}>Rx #{rx.id}</Text>
             <Text style={styles.clinicMetaText}>
-              {new Date(rx.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+              {new Date(rx.date).toLocaleDateString(locale, { month: "long", day: "numeric", year: "numeric" })}
             </Text>
           </View>
         </LinearGradient>
@@ -65,17 +69,17 @@ export default function PrescriptionScreen() {
             <Text style={styles.docAvatarText}>{rx.doctorSignature}</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.prescribedBy}>Prescribed by</Text>
+            <Text style={styles.prescribedBy}>{t.prescribedBy}</Text>
             <Text style={styles.doctorName}>{rx.doctorName}</Text>
           </View>
           <View style={styles.signedBadge}>
             <Feather name="check-circle" size={14} color={Colors.success} />
-            <Text style={styles.signedText}>Signed</Text>
+            <Text style={styles.signedText}>{t.signed}</Text>
           </View>
         </View>
 
         {/* Medications */}
-        <Text style={styles.sectionTitle}>Medications</Text>
+        <Text style={styles.sectionTitle}>{t.medications}</Text>
         {rx.medications.map((med, i) => (
           <View key={i} style={styles.medCard}>
             <View style={styles.medHeader}>
@@ -86,15 +90,15 @@ export default function PrescriptionScreen() {
             </View>
             <View style={styles.medDetails}>
               <View style={styles.medDetail}>
-                <Text style={styles.medDetailLabel}>Dosage</Text>
+                <Text style={styles.medDetailLabel}>{t.dosage}</Text>
                 <Text style={styles.medDetailValue}>{med.dosage}</Text>
               </View>
               <View style={styles.medDetail}>
-                <Text style={styles.medDetailLabel}>Frequency</Text>
+                <Text style={styles.medDetailLabel}>{t.frequency}</Text>
                 <Text style={styles.medDetailValue}>{med.frequency}</Text>
               </View>
               <View style={styles.medDetail}>
-                <Text style={styles.medDetailLabel}>Duration</Text>
+                <Text style={styles.medDetailLabel}>{t.duration}</Text>
                 <Text style={styles.medDetailValue}>{med.duration}</Text>
               </View>
             </View>
@@ -105,7 +109,7 @@ export default function PrescriptionScreen() {
           <View style={styles.notesCard}>
             <View style={styles.notesHeader}>
               <Feather name="file-text" size={16} color={Colors.primary} />
-              <Text style={styles.notesTitle}>Doctor's Notes</Text>
+              <Text style={styles.notesTitle}>{t.doctorsNotes}</Text>
             </View>
             <Text style={styles.notesText}>{rx.notes}</Text>
           </View>
@@ -114,7 +118,7 @@ export default function PrescriptionScreen() {
         <View style={styles.warningCard}>
           <Feather name="alert-triangle" size={16} color={Colors.warning} />
           <Text style={styles.warningText}>
-            This prescription is valid as issued. Do not share or reuse. Contact the clinic if you have any concerns.
+            {t.prescriptionWarning}
           </Text>
         </View>
       </ScrollView>

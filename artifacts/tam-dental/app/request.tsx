@@ -15,55 +15,47 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 import { useAppContext } from "@/context/AppContext";
-
-type RequestType = {
-  id: string;
-  label: string;
-  icon: string;
-  description: string;
-  color: string;
-  bg: string;
-};
-
-const REQUEST_TYPES: RequestType[] = [
-  { id: "radiograph", label: "Radiograph", icon: "radiobox-marked", description: "Request X-ray or dental radiograph copy", color: Colors.info, bg: Colors.infoLight },
-  { id: "sick_leave", label: "Sick Leave", icon: "file-medical-outline", description: "Medical certificate for sick leave", color: Colors.success, bg: Colors.successLight },
-  { id: "report", label: "Medical Report", icon: "file-chart-outline", description: "Comprehensive medical or dental report", color: Colors.primary, bg: "#EEF6FB" },
-  { id: "referral", label: "Referral Letter", icon: "email-send-outline", description: "Referral to a specialist or hospital", color: Colors.accent, bg: "#E0F9F7" },
-  { id: "treatment_plan", label: "Treatment Plan", icon: "clipboard-list-outline", description: "Detailed treatment plan document", color: Colors.warning, bg: Colors.warningLight },
-  { id: "other", label: "Other", icon: "dots-horizontal-circle-outline", description: "Any other documentation request", color: Colors.textSecondary, bg: Colors.backgroundMuted },
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function RequestScreen() {
   const insets = useSafeAreaInsets();
   const { patient } = useAppContext();
+  const { t, language } = useLanguage();
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [details, setDetails] = useState("");
   const [purpose, setPurpose] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const selectedTypeObj = REQUEST_TYPES.find((t) => t.id === selectedType);
+  const REQUEST_TYPES = [
+    { id: "radiograph", label: t.reqRadiograph, icon: "radiobox-marked", description: t.reqRadiographDesc, color: Colors.info, bg: Colors.infoLight },
+    { id: "sick_leave", label: t.reqSickLeave, icon: "file-medical-outline", description: t.reqSickLeaveDesc, color: Colors.success, bg: Colors.successLight },
+    { id: "report", label: t.reqReport, icon: "file-chart-outline", description: t.reqReportDesc, color: Colors.primary, bg: "#EEF6FB" },
+    { id: "referral", label: t.reqReferral, icon: "email-send-outline", description: t.reqReferralDesc, color: Colors.accent, bg: "#E0F9F7" },
+    { id: "treatment_plan", label: t.reqTreatmentPlan, icon: "clipboard-list-outline", description: t.reqTreatmentPlanDesc, color: Colors.warning, bg: Colors.warningLight },
+    { id: "other", label: t.reqOther, icon: "dots-horizontal-circle-outline", description: t.reqOtherDesc, color: Colors.textSecondary, bg: Colors.backgroundMuted },
+  ];
+
+  const selectedTypeObj = REQUEST_TYPES.find((tp) => tp.id === selectedType);
 
   const handleSubmit = () => {
     if (!selectedType) {
-      Alert.alert("Select Request Type", "Please select the type of document you need.");
+      Alert.alert(t.selectRequestType, t.selectRequestTypeMsg);
       return;
     }
-    if (details.trim().length < 10) {
-      Alert.alert("More Details Needed", "Please provide at least a brief description of your request.");
+    if (details.trim().length < 5) {
+      Alert.alert(t.moreDetails, t.moreDetailsMsg);
       return;
     }
 
     setSubmitting(true);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-    // In real app: submit to Excel sheet via API
     setTimeout(() => {
       setSubmitting(false);
       Alert.alert(
-        "Request Submitted",
-        `Your ${selectedTypeObj?.label} request has been submitted. Our team will process it within 2–3 business days and contact you at ${patient.phone}.`,
-        [{ text: "OK", onPress: () => router.back() }]
+        t.requestSubmitted,
+        t.requestSubmittedMsg(selectedTypeObj?.label ?? "", patient.phone),
+        [{ text: t.ok, onPress: () => router.back() }]
       );
     }, 1000);
   };
@@ -74,7 +66,7 @@ export default function RequestScreen() {
         <Pressable style={styles.closeBtn} onPress={() => router.back()}>
           <Feather name="x" size={22} color={Colors.text} />
         </Pressable>
-        <Text style={styles.headerTitle}>Submit a Request</Text>
+        <Text style={styles.headerTitle}>{t.submitRequest}</Text>
         <View style={styles.closeBtn} />
       </View>
 
@@ -84,11 +76,9 @@ export default function RequestScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.intro}>
-          Need a medical document? Submit your request and our team will process it promptly.
-        </Text>
+        <Text style={styles.intro}>{t.requestIntro}</Text>
 
-        <Text style={styles.sectionLabel}>Request Type</Text>
+        <Text style={styles.sectionLabel}>{t.requestType}</Text>
         <View style={styles.typesGrid}>
           {REQUEST_TYPES.map((type) => (
             <Pressable
@@ -118,54 +108,57 @@ export default function RequestScreen() {
           ))}
         </View>
 
-        <Text style={styles.sectionLabel}>Request Details</Text>
+        <Text style={styles.sectionLabel}>{t.requestDetails}</Text>
         <TextInput
           style={styles.textArea}
-          placeholder="Please describe your request in detail (e.g., date of appointment, specific procedure, intended use...)"
+          placeholder={t.requestDetailsPlaceholder}
           placeholderTextColor={Colors.textMuted}
           multiline
           numberOfLines={4}
           value={details}
           onChangeText={setDetails}
           textAlignVertical="top"
+          textAlign={language === "ar" ? "right" : "left"}
         />
 
-        <Text style={styles.sectionLabel}>Purpose / Intended Use (optional)</Text>
+        <Text style={styles.sectionLabel}>{t.purposeLabel}</Text>
         <TextInput
           style={[styles.textArea, { minHeight: 60 }]}
-          placeholder="e.g., Insurance claim, travel, employer, government..."
+          placeholder={t.purposePlaceholder}
           placeholderTextColor={Colors.textMuted}
           multiline
           numberOfLines={2}
           value={purpose}
           onChangeText={setPurpose}
           textAlignVertical="top"
+          textAlign={language === "ar" ? "right" : "left"}
         />
 
-        {/* Patient Info */}
         <View style={styles.patientInfo}>
           <Feather name="user" size={16} color={Colors.textSecondary} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.patientInfoTitle}>Submitting as</Text>
-            <Text style={styles.patientInfoText}>{patient.name} · {patient.recordNumber}</Text>
+            <Text style={styles.patientInfoTitle}>{t.submittingAs}</Text>
+            <Text style={styles.patientInfoText}>
+              {language === "ar" ? patient.nameAr : patient.name} · {patient.recordNumber}
+            </Text>
             <Text style={styles.patientInfoText}>{patient.phone}</Text>
           </View>
         </View>
 
         <View style={styles.noteBox}>
           <Feather name="clock" size={14} color={Colors.textSecondary} />
-          <Text style={styles.noteText}>Processing time: 2–3 business days. We will contact you when your document is ready.</Text>
+          <Text style={styles.noteText}>{t.processingTime}</Text>
         </View>
       </ScrollView>
 
       <View style={[styles.bottomBar, { paddingBottom: insets.bottom + (Platform.OS === "web" ? 34 : 0) + 10 }]}>
         <Pressable
-          style={[styles.submitBtn, (!selectedType || details.length < 10 || submitting) && styles.submitBtnDisabled]}
+          style={[styles.submitBtn, (!selectedType || details.length < 5 || submitting) && styles.submitBtnDisabled]}
           onPress={handleSubmit}
-          disabled={!selectedType || details.length < 10 || submitting}
+          disabled={!selectedType || details.length < 5 || submitting}
         >
           <Feather name="send" size={18} color="#fff" />
-          <Text style={styles.submitBtnText}>{submitting ? "Submitting..." : "Submit Request"}</Text>
+          <Text style={styles.submitBtnText}>{submitting ? t.submitting : t.submitRequestBtn}</Text>
         </Pressable>
       </View>
     </View>

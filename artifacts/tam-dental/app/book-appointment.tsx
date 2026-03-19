@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
+import { useLanguage } from "@/context/LanguageContext";
 
 const DOCTORS = [
   { id: "D1", name: "Dr. Sarah Al-Farsi", specialty: "Orthodontist", available: true },
@@ -29,14 +30,21 @@ const TIME_SLOTS = [
   "4:00 PM", "4:30 PM",
 ];
 
-const REASONS = [
+const REASONS_EN = [
   "Routine Checkup", "Teeth Cleaning", "Toothache", "Orthodontic Visit",
   "Whitening Consultation", "Implant Consultation", "Cavity Treatment",
   "Emergency", "Follow-up", "Other",
 ];
 
+const REASONS_AR = [
+  "فحص دوري", "تنظيف الأسنان", "ألم الأسنان", "زيارة تقويم",
+  "استشارة تبييض", "استشارة زرع", "علاج تسوس",
+  "طارئ", "متابعة", "أخرى",
+];
+
 export default function BookAppointmentScreen() {
   const insets = useSafeAreaInsets();
+  const { t, language } = useLanguage();
   const [step, setStep] = useState(1);
   const [selectedDoctor, setSelectedDoctor] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -45,6 +53,8 @@ export default function BookAppointmentScreen() {
   const [notes, setNotes] = useState("");
 
   const doctor = DOCTORS.find((d) => d.id === selectedDoctor);
+  const REASONS = language === "ar" ? REASONS_AR : REASONS_EN;
+  const locale = language === "ar" ? "ar-SA" : "en-US";
 
   const getNextDays = (n: number) => {
     const days: { key: string; label: string; dayShort: string; dayNum: string }[] = [];
@@ -55,8 +65,8 @@ export default function BookAppointmentScreen() {
       const key = d.toISOString().split("T")[0];
       days.push({
         key,
-        label: d.toLocaleDateString("en-US", { weekday: "short" }),
-        dayShort: d.toLocaleDateString("en-US", { month: "short" }),
+        label: d.toLocaleDateString(locale, { weekday: "short" }),
+        dayShort: d.toLocaleDateString(locale, { month: "short" }),
         dayNum: d.getDate().toString(),
       });
     }
@@ -67,29 +77,29 @@ export default function BookAppointmentScreen() {
 
   const handleBook = () => {
     if (!selectedDoctor || !selectedDate || !selectedTime || !selectedReason) {
-      Alert.alert("Missing Info", "Please complete all required fields.");
+      Alert.alert(t.missingInfo, t.missingInfoMsg);
       return;
     }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     Alert.alert(
-      "Appointment Booked!",
-      `Your appointment with ${doctor?.name} on ${selectedDate} at ${selectedTime} has been requested. You will receive a confirmation shortly.`,
-      [{ text: "OK", onPress: () => router.back() }]
+      t.bookingSuccess,
+      t.bookingSuccessMsg(doctor?.name ?? "", selectedDate, selectedTime),
+      [{ text: t.ok, onPress: () => router.back() }]
     );
   };
 
+  const stepLabels = [t.selectDoctor, t.selectDateTime, t.reasonAndNotes];
+
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
-      {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) + 12 }]}>
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
           <Feather name="x" size={22} color={Colors.text} />
         </Pressable>
-        <Text style={styles.headerTitle}>Book Appointment</Text>
+        <Text style={styles.headerTitle}>{t.bookAppointmentTitle}</Text>
         <View style={styles.backBtn} />
       </View>
 
-      {/* Steps indicator */}
       <View style={styles.stepsRow}>
         {[1, 2, 3].map((s) => (
           <React.Fragment key={s}>
@@ -108,7 +118,7 @@ export default function BookAppointmentScreen() {
       >
         {step === 1 && (
           <View>
-            <Text style={styles.stepTitle}>Select a Doctor</Text>
+            <Text style={styles.stepTitle}>{t.selectDoctor}</Text>
             {DOCTORS.map((d) => (
               <Pressable
                 key={d.id}
@@ -129,7 +139,7 @@ export default function BookAppointmentScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.docName, !d.available && { color: Colors.textMuted }]}>{d.name}</Text>
                   <Text style={styles.docSpec}>{d.specialty}</Text>
-                  {!d.available && <Text style={styles.unavailableText}>Not available</Text>}
+                  {!d.available && <Text style={styles.unavailableText}>{t.notAvailable}</Text>}
                 </View>
                 {selectedDoctor === d.id && (
                   <Feather name="check-circle" size={22} color={Colors.primary} />
@@ -141,8 +151,8 @@ export default function BookAppointmentScreen() {
 
         {step === 2 && (
           <View>
-            <Text style={styles.stepTitle}>Select Date & Time</Text>
-            <Text style={styles.subLabel}>Date</Text>
+            <Text style={styles.stepTitle}>{t.selectDateTime}</Text>
+            <Text style={styles.subLabel}>{t.dateLabel}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.daysScroll}>
               <View style={styles.daysRow}>
                 {days.map((day) => (
@@ -165,7 +175,7 @@ export default function BookAppointmentScreen() {
 
             {selectedDate && (
               <>
-                <Text style={[styles.subLabel, { marginTop: 20 }]}>Available Times</Text>
+                <Text style={[styles.subLabel, { marginTop: 20 }]}>{t.availableTimes}</Text>
                 <View style={styles.timesGrid}>
                   {TIME_SLOTS.map((slot) => (
                     <Pressable
@@ -187,8 +197,8 @@ export default function BookAppointmentScreen() {
 
         {step === 3 && (
           <View>
-            <Text style={styles.stepTitle}>Reason & Notes</Text>
-            <Text style={styles.subLabel}>Reason for Visit</Text>
+            <Text style={styles.stepTitle}>{t.reasonAndNotes}</Text>
+            <Text style={styles.subLabel}>{t.reasonForVisit}</Text>
             <View style={styles.reasonsGrid}>
               {REASONS.map((r) => (
                 <Pressable
@@ -204,28 +214,28 @@ export default function BookAppointmentScreen() {
               ))}
             </View>
 
-            <Text style={[styles.subLabel, { marginTop: 20 }]}>Additional Notes (optional)</Text>
+            <Text style={[styles.subLabel, { marginTop: 20 }]}>{t.additionalNotes}</Text>
             <TextInput
               style={styles.notesInput}
-              placeholder="Any specific concerns or information for the doctor..."
+              placeholder={t.additionalNotesPlaceholder}
               placeholderTextColor={Colors.textMuted}
               multiline
               numberOfLines={4}
               value={notes}
               onChangeText={setNotes}
               textAlignVertical="top"
+              textAlign={language === "ar" ? "right" : "left"}
             />
 
-            {/* Summary */}
             <View style={styles.summaryCard}>
-              <Text style={styles.summaryTitle}>Appointment Summary</Text>
+              <Text style={styles.summaryTitle}>{t.appointmentSummary}</Text>
               <View style={styles.summaryRow}>
                 <Feather name="user" size={14} color={Colors.textSecondary} />
                 <Text style={styles.summaryText}>{doctor?.name}</Text>
               </View>
               <View style={styles.summaryRow}>
                 <Feather name="calendar" size={14} color={Colors.textSecondary} />
-                <Text style={styles.summaryText}>{selectedDate} at {selectedTime}</Text>
+                <Text style={styles.summaryText}>{selectedDate} · {selectedTime}</Text>
               </View>
               <View style={styles.summaryRow}>
                 <Feather name="clipboard" size={14} color={Colors.textSecondary} />
@@ -236,12 +246,11 @@ export default function BookAppointmentScreen() {
         )}
       </ScrollView>
 
-      {/* Bottom actions */}
       <View style={[styles.bottomBar, { paddingBottom: insets.bottom + (Platform.OS === "web" ? 34 : 0) + 10 }]}>
         {step > 1 && (
           <Pressable style={styles.backBtnSecondary} onPress={() => setStep(step - 1)}>
-            <Feather name="arrow-left" size={18} color={Colors.primary} />
-            <Text style={styles.backBtnText}>Back</Text>
+            <Feather name={language === "ar" ? "arrow-right" : "arrow-left"} size={18} color={Colors.primary} />
+            <Text style={styles.backBtnText}>{t.back}</Text>
           </Pressable>
         )}
         <Pressable
@@ -264,8 +273,8 @@ export default function BookAppointmentScreen() {
             (step === 3 && !selectedReason)
           }
         >
-          <Text style={styles.nextBtnText}>{step === 3 ? "Confirm Booking" : "Next"}</Text>
-          <Feather name={step === 3 ? "check" : "arrow-right"} size={18} color="#fff" />
+          <Text style={styles.nextBtnText}>{step === 3 ? t.confirmBooking : t.next}</Text>
+          <Feather name={step === 3 ? "check" : (language === "ar" ? "arrow-left" : "arrow-right")} size={18} color="#fff" />
         </Pressable>
       </View>
     </View>

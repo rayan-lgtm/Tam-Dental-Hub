@@ -13,8 +13,11 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 import { useAppContext } from "@/context/AppContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 function PrescriptionCard({ rx }: { rx: ReturnType<typeof useAppContext>["prescriptions"][0] }) {
+  const { t, language } = useLanguage();
+  const locale = language === "ar" ? "ar-SA" : "en-US";
   return (
     <Pressable
       style={styles.card}
@@ -29,12 +32,14 @@ function PrescriptionCard({ rx }: { rx: ReturnType<typeof useAppContext>["prescr
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.cardTitle}>{rx.id}</Text>
-          <Text style={styles.cardSub}>Prescribed by {rx.doctorName}</Text>
-          <Text style={styles.cardDate}>{new Date(rx.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</Text>
+          <Text style={styles.cardSub}>{t.prescribedBy} {rx.doctorName}</Text>
+          <Text style={styles.cardDate}>
+            {new Date(rx.date).toLocaleDateString(locale, { month: "short", day: "numeric", year: "numeric" })}
+          </Text>
         </View>
         <View style={styles.medCount}>
           <Text style={styles.medCountNum}>{rx.medications.length}</Text>
-          <Text style={styles.medCountLabel}>meds</Text>
+          <Text style={styles.medCountLabel}>{t.medications.slice(0, 4)}</Text>
         </View>
         <Feather name="chevron-right" size={18} color={Colors.textMuted} />
       </View>
@@ -43,6 +48,9 @@ function PrescriptionCard({ rx }: { rx: ReturnType<typeof useAppContext>["prescr
 }
 
 function QuestionnaireCard({ q }: { q: ReturnType<typeof useAppContext>["questionnaires"][0] }) {
+  const { t, language } = useLanguage();
+  const locale = language === "ar" ? "ar-SA" : "en-US";
+
   const typeConfig = {
     medical_history: { icon: "clipboard-pulse-outline", label: "Medical History", color: Colors.primary },
     consent: { icon: "file-sign", label: "Consent Form", color: Colors.warning },
@@ -66,11 +74,13 @@ function QuestionnaireCard({ q }: { q: ReturnType<typeof useAppContext>["questio
         <View style={{ flex: 1 }}>
           <Text style={styles.cardTitle}>{q.title}</Text>
           <Text style={styles.cardSub}>{config.label}</Text>
-          <Text style={styles.cardDate}>Due: {new Date(q.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</Text>
+          <Text style={styles.cardDate}>
+            {new Date(q.dueDate).toLocaleDateString(locale, { month: "short", day: "numeric" })}
+          </Text>
         </View>
         <View style={[styles.statusPill, q.status === "completed" ? styles.statusDone : styles.statusPending]}>
           <Text style={[styles.statusText, { color: q.status === "completed" ? Colors.success : Colors.warning }]}>
-            {q.status === "completed" ? "Done" : "Pending"}
+            {q.status === "completed" ? t.done : t.loading.slice(0, 7)}
           </Text>
         </View>
         <Feather name="chevron-right" size={18} color={Colors.textMuted} />
@@ -82,12 +92,13 @@ function QuestionnaireCard({ q }: { q: ReturnType<typeof useAppContext>["questio
 export default function HealthScreen() {
   const insets = useSafeAreaInsets();
   const { prescriptions, questionnaires } = useAppContext();
+  const { t } = useLanguage();
   const pendingForms = questionnaires.filter((q) => q.status === "pending");
 
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) + 16 }]}>
-        <Text style={styles.title}>Health Records</Text>
+        <Text style={styles.title}>{t.healthRecords}</Text>
       </View>
 
       <ScrollView
@@ -98,29 +109,24 @@ export default function HealthScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Pending Forms Alert */}
         {pendingForms.length > 0 && (
           <View style={styles.alertBox}>
             <Feather name="alert-circle" size={18} color={Colors.warning} />
-            <Text style={styles.alertText}>
-              {pendingForms.length} form{pendingForms.length > 1 ? "s" : ""} require your attention before your next visit
-            </Text>
+            <Text style={styles.alertText}>{t.pendingFormsAlert(pendingForms.length)}</Text>
           </View>
         )}
 
-        {/* Prescriptions */}
-        <Text style={styles.sectionTitle}>Prescriptions</Text>
+        <Text style={styles.sectionTitle}>{t.prescriptions}</Text>
         {prescriptions.length === 0 ? (
           <View style={styles.emptySection}>
             <Feather name="file-minus" size={32} color={Colors.textMuted} />
-            <Text style={styles.emptyText}>No prescriptions yet</Text>
+            <Text style={styles.emptyText}>{t.noPrescriptions}</Text>
           </View>
         ) : (
           prescriptions.map((rx) => <PrescriptionCard key={rx.id} rx={rx} />)
         )}
 
-        {/* Forms & Consents */}
-        <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Forms & Consents</Text>
+        <Text style={[styles.sectionTitle, { marginTop: 20 }]}>{t.formsConsents}</Text>
         {questionnaires.map((q) => <QuestionnaireCard key={q.id} q={q} />)}
       </ScrollView>
     </View>

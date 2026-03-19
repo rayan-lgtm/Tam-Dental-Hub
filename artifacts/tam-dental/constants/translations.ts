@@ -183,6 +183,16 @@ export const translations = {
     reqOther: "Other",
     reqOtherDesc: "Any other documentation request",
 
+    // Prescription extra
+    doctorsNotes: "Doctor's Notes",
+    signed: "Signed",
+    clinicSubtitle: "Licensed Dental Practice • KSA",
+
+    // Questionnaire extra
+    formSubmitted: "Submitted",
+    formSubmittedMsg: "Thank you! Your form has been submitted successfully.",
+    progressAnswered: (answered: number, total: number) => `${answered} of ${total} answered`,
+
     // Profile
     profile: "Profile",
     myRecords: "My Records",
@@ -387,6 +397,16 @@ export const translations = {
     reqTreatmentPlanDesc: "وثيقة خطة علاج مفصّلة",
     reqOther: "أخرى",
     reqOtherDesc: "أي طلب توثيق آخر",
+
+    // Prescription extra
+    doctorsNotes: "ملاحظات الطبيب",
+    signed: "موقّعة",
+    clinicSubtitle: "ممارسة طب الأسنان المرخصة • المملكة العربية السعودية",
+
+    // Questionnaire extra
+    formSubmitted: "تم الإرسال",
+    formSubmittedMsg: "شكراً! تم تقديم نموذجك بنجاح.",
+    progressAnswered: (answered: number, total: number) => `${answered} من ${total} تمت الإجابة عليها`,
 
     // Profile
     profile: "الملف الشخصي",

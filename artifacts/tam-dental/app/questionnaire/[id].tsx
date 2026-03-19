@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 import { useAppContext } from "@/context/AppContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 type Question = { id: string; text: string; type: "boolean" | "choice"; options?: string[] };
 
@@ -57,6 +58,7 @@ export default function QuestionnaireScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { questionnaires } = useAppContext();
+  const { t } = useLanguage();
   const form = QUESTIONNAIRES_DATA[id ?? ""];
   const q = questionnaires.find((q) => q.id === id);
 
@@ -66,7 +68,7 @@ export default function QuestionnaireScreen() {
   if (!form || !q) {
     return (
       <View style={styles.container}>
-        <Text style={styles.notFound}>Form not found</Text>
+        <Text style={styles.notFound}>{t.error}</Text>
       </View>
     );
   }
@@ -75,12 +77,12 @@ export default function QuestionnaireScreen() {
 
   const handleSubmit = () => {
     if (!allAnswered) {
-      Alert.alert("Incomplete", "Please answer all questions before submitting.");
+      Alert.alert(t.incomplete, t.incompleteMsg);
       return;
     }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setSubmitted(true);
-    Alert.alert("Submitted", "Thank you! Your form has been submitted successfully.");
+    Alert.alert(t.formSubmitted, t.formSubmittedMsg);
   };
 
   if (submitted) {
@@ -97,12 +99,10 @@ export default function QuestionnaireScreen() {
           <View style={styles.doneIcon}>
             <Feather name="check-circle" size={48} color={Colors.success} />
           </View>
-          <Text style={styles.doneTitle}>Form Completed</Text>
-          <Text style={styles.doneText}>
-            Your {form.title.toLowerCase()} has been submitted and is on file with TAM Dental.
-          </Text>
+          <Text style={styles.doneTitle}>{t.formCompleted}</Text>
+          <Text style={styles.doneText}>{t.formCompletedMsg(form.title)}</Text>
           <Pressable style={styles.doneBtn} onPress={() => router.back()}>
-            <Text style={styles.doneBtnText}>Go Back</Text>
+            <Text style={styles.doneBtnText}>{t.goBack}</Text>
           </Pressable>
         </View>
       </View>
@@ -130,7 +130,7 @@ export default function QuestionnaireScreen() {
         />
       </View>
       <Text style={styles.progressText}>
-        {Object.keys(answers).length} of {form.questions.length} answered
+        {t.progressAnswered(Object.keys(answers).length, form.questions.length)}
       </Text>
 
       <ScrollView
@@ -149,26 +149,26 @@ export default function QuestionnaireScreen() {
 
             {question.type === "boolean" && (
               <View style={styles.booleanRow}>
-                {(["Yes", "No"] as const).map((opt) => (
+                {([t.yes, t.no] as const).map((opt) => (
                   <Pressable
                     key={opt}
                     style={[
                       styles.boolBtn,
-                      answers[question.id] === (opt === "Yes") && styles.boolBtnActive,
-                      opt === "No" && answers[question.id] === false && styles.boolBtnNo,
+                      answers[question.id] === (opt === t.yes) && styles.boolBtnActive,
+                      opt === t.no && answers[question.id] === false && styles.boolBtnNo,
                     ]}
                     onPress={() => {
                       Haptics.selectionAsync();
-                      setAnswers((prev) => ({ ...prev, [question.id]: opt === "Yes" }));
+                      setAnswers((prev) => ({ ...prev, [question.id]: opt === t.yes }));
                     }}
                   >
                     <Feather
-                      name={opt === "Yes" ? "check" : "x"}
+                      name={opt === t.yes ? "check" : "x"}
                       size={16}
                       color={
-                        answers[question.id] === (opt === "Yes")
+                        answers[question.id] === (opt === t.yes)
                           ? "#fff"
-                          : answers[question.id] === false && opt === "No"
+                          : answers[question.id] === false && opt === t.no
                           ? "#fff"
                           : Colors.textSecondary
                       }
@@ -176,8 +176,8 @@ export default function QuestionnaireScreen() {
                     <Text
                       style={[
                         styles.boolBtnText,
-                        (answers[question.id] === (opt === "Yes") ||
-                          (answers[question.id] === false && opt === "No")) && { color: "#fff" },
+                        (answers[question.id] === (opt === t.yes) ||
+                          (answers[question.id] === false && opt === t.no)) && { color: "#fff" },
                       ]}
                     >
                       {opt}
@@ -217,7 +217,7 @@ export default function QuestionnaireScreen() {
           disabled={!allAnswered}
         >
           <Feather name="send" size={18} color="#fff" />
-          <Text style={styles.submitBtnText}>Submit Form</Text>
+          <Text style={styles.submitBtnText}>{t.submitForm}</Text>
         </Pressable>
       </View>
     </View>

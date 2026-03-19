@@ -15,39 +15,42 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 import { useAppContext } from "@/context/AppContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function InvoiceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { invoices, payInvoice } = useAppContext();
+  const { t, language } = useLanguage();
   const invoice = invoices.find((inv) => inv.id === id);
 
   if (!invoice) {
     return (
       <View style={styles.container}>
-        <Text style={styles.notFound}>Invoice not found</Text>
+        <Text style={styles.notFound}>{t.error}</Text>
       </View>
     );
   }
 
+  const locale = language === "ar" ? "ar-SA" : "en-US";
   const statusConfig = {
-    paid: { color: Colors.success, bg: Colors.successLight, label: "Paid" },
-    unpaid: { color: Colors.danger, bg: Colors.dangerLight, label: "Unpaid" },
-    partial: { color: Colors.warning, bg: Colors.warningLight, label: "Partial" },
+    paid: { color: Colors.success, bg: Colors.successLight, label: t.paid },
+    unpaid: { color: Colors.danger, bg: Colors.dangerLight, label: t.unpaid },
+    partial: { color: Colors.warning, bg: Colors.warningLight, label: t.unpaid },
   }[invoice.status];
 
   const handlePay = () => {
     Alert.alert(
-      "Confirm Payment",
-      `Pay ${invoice.currency} ${invoice.amount.toLocaleString()} for ${invoice.description}?`,
+      t.payConfirmTitle,
+      t.payConfirmMsg(invoice.currency, invoice.amount.toLocaleString(), invoice.description),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t.cancel, style: "cancel" },
         {
-          text: "Pay Now",
+          text: t.payNow,
           onPress: () => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             payInvoice(invoice.id);
-            Alert.alert("Payment Successful", "Your payment has been processed and a receipt sent to your email.");
+            Alert.alert(t.paymentSuccess, t.paymentSuccessMsg);
           },
         },
       ]
@@ -60,7 +63,7 @@ export default function InvoiceDetailScreen() {
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
           <Feather name="arrow-left" size={22} color={Colors.text} />
         </Pressable>
-        <Text style={styles.headerTitle}>Invoice</Text>
+        <Text style={styles.headerTitle}>{t.billing}</Text>
         <View style={styles.backBtn} />
       </View>
 
@@ -79,13 +82,13 @@ export default function InvoiceDetailScreen() {
           <Text style={styles.heroDesc}>{invoice.description}</Text>
           <Text style={styles.heroAmount}>{invoice.currency} {invoice.amount.toLocaleString()}</Text>
           <Text style={styles.heroDate}>
-            {new Date(invoice.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            {new Date(invoice.date).toLocaleDateString(locale, { month: "long", day: "numeric", year: "numeric" })}
           </Text>
         </LinearGradient>
 
         {/* Line Items */}
         <View style={styles.itemsCard}>
-          <Text style={styles.cardTitle}>Services</Text>
+          <Text style={styles.cardTitle}>{t.services}</Text>
           <View style={styles.divider} />
           {invoice.items.map((item, i) => (
             <View key={i} style={styles.itemRow}>
@@ -95,7 +98,7 @@ export default function InvoiceDetailScreen() {
           ))}
           <View style={[styles.divider, { marginTop: 8 }]} />
           <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalLabel}>{t.total}</Text>
             <Text style={styles.totalAmount}>{invoice.currency} {invoice.amount.toLocaleString()}</Text>
           </View>
         </View>
@@ -104,23 +107,21 @@ export default function InvoiceDetailScreen() {
         <View style={styles.infoCard}>
           <Feather name="info" size={16} color={Colors.info} />
           <Text style={styles.infoText}>
-            {invoice.status === "paid"
-              ? "This invoice has been fully settled. Thank you for your payment."
-              : "Please settle this invoice before or on the day of your next appointment. Online payment is secure and encrypted."}
+            {invoice.status === "paid" ? t.invoicePaidNote : t.invoiceUnpaidNote}
           </Text>
         </View>
 
         {invoice.status !== "paid" && (
           <Pressable style={styles.payBtn} onPress={handlePay}>
             <Feather name="credit-card" size={18} color="#fff" />
-            <Text style={styles.payBtnText}>Pay SAR {invoice.amount.toLocaleString()} Online</Text>
+            <Text style={styles.payBtnText}>{t.payOnline} · {invoice.currency} {invoice.amount.toLocaleString()}</Text>
           </Pressable>
         )}
 
         {invoice.status === "paid" && (
           <View style={styles.paidConfirmation}>
             <Feather name="check-circle" size={22} color={Colors.success} />
-            <Text style={styles.paidText}>Payment Complete</Text>
+            <Text style={styles.paidText}>{t.paymentComplete}</Text>
           </View>
         )}
       </ScrollView>

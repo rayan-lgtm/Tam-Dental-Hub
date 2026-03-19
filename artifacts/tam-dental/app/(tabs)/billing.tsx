@@ -14,28 +14,31 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 import { useAppContext, type Invoice } from "@/context/AppContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 function InvoiceCard({ invoice }: { invoice: Invoice }) {
   const { payInvoice } = useAppContext();
+  const { t, language } = useLanguage();
+  const locale = language === "ar" ? "ar-SA" : "en-US";
 
   const statusConfig = {
-    paid: { color: Colors.success, bg: Colors.successLight, label: "Paid" },
-    unpaid: { color: Colors.danger, bg: Colors.dangerLight, label: "Unpaid" },
-    partial: { color: Colors.warning, bg: Colors.warningLight, label: "Partial" },
+    paid: { color: Colors.success, bg: Colors.successLight, label: t.paid },
+    unpaid: { color: Colors.danger, bg: Colors.dangerLight, label: t.unpaid },
+    partial: { color: Colors.warning, bg: Colors.warningLight, label: t.unpaid },
   }[invoice.status];
 
   const handlePay = () => {
     Alert.alert(
-      "Confirm Payment",
-      `Pay ${invoice.currency} ${invoice.amount.toLocaleString()} for ${invoice.description}?`,
+      t.payConfirmTitle,
+      t.payConfirmMsg(invoice.currency, invoice.amount.toLocaleString(), invoice.description),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t.cancel, style: "cancel" },
         {
-          text: "Pay Now",
+          text: t.payNow,
           onPress: () => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             payInvoice(invoice.id);
-            Alert.alert("Payment Successful", "Your payment has been processed. A receipt has been sent to your email.");
+            Alert.alert(t.paymentSuccess, t.paymentSuccessMsg);
           },
         },
       ]
@@ -55,7 +58,7 @@ function InvoiceCard({ invoice }: { invoice: Invoice }) {
           <Text style={styles.invoiceId}>{invoice.id}</Text>
           <Text style={styles.invoiceDesc}>{invoice.description}</Text>
           <Text style={styles.invoiceDate}>
-            {new Date(invoice.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            {new Date(invoice.date).toLocaleDateString(locale, { month: "long", day: "numeric", year: "numeric" })}
           </Text>
         </View>
         <View>
@@ -80,7 +83,7 @@ function InvoiceCard({ invoice }: { invoice: Invoice }) {
       {invoice.status !== "paid" && (
         <Pressable style={styles.payBtn} onPress={handlePay}>
           <Feather name="credit-card" size={16} color="#fff" />
-          <Text style={styles.payBtnText}>Pay Online</Text>
+          <Text style={styles.payBtnText}>{t.payOnline}</Text>
         </Pressable>
       )}
     </Pressable>
@@ -90,6 +93,7 @@ function InvoiceCard({ invoice }: { invoice: Invoice }) {
 export default function BillingScreen() {
   const insets = useSafeAreaInsets();
   const { invoices } = useAppContext();
+  const { t } = useLanguage();
   const [filter, setFilter] = useState<"all" | "unpaid" | "paid">("all");
 
   const filtered = filter === "all" ? invoices : invoices.filter((inv) => {
@@ -101,21 +105,26 @@ export default function BillingScreen() {
     .filter((inv) => inv.status !== "paid")
     .reduce((s, inv) => s + inv.amount, 0);
 
+  const filterLabels: Record<string, string> = {
+    all: t.all,
+    unpaid: t.unpaid,
+    paid: t.paid,
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) + 16 }]}>
-        <Text style={styles.title}>Billing</Text>
+        <Text style={styles.title}>{t.billing}</Text>
       </View>
 
       {totalUnpaid > 0 && (
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>Total Outstanding</Text>
+          <Text style={styles.summaryLabel}>{t.totalOutstanding}</Text>
           <Text style={styles.summaryAmount}>SAR {totalUnpaid.toLocaleString()}</Text>
-          <Text style={styles.summaryNote}>Please settle before your next visit</Text>
+          <Text style={styles.summaryNote}>{t.outstandingNote}</Text>
         </View>
       )}
 
-      {/* Filter tabs */}
       <View style={styles.filterRow}>
         {(["all", "unpaid", "paid"] as const).map((f) => (
           <Pressable
@@ -127,7 +136,7 @@ export default function BillingScreen() {
             }}
           >
             <Text style={[styles.filterText, filter === f && styles.filterTextActive]}>
-              {f.charAt(0).toUpperCase() + f.slice(1)}
+              {filterLabels[f]}
             </Text>
           </Pressable>
         ))}
@@ -144,7 +153,7 @@ export default function BillingScreen() {
         {filtered.length === 0 ? (
           <View style={styles.emptyState}>
             <Feather name="credit-card" size={48} color={Colors.textMuted} />
-            <Text style={styles.emptyText}>No {filter} invoices</Text>
+            <Text style={styles.emptyText}>{t.noInvoices(filterLabels[filter])}</Text>
           </View>
         ) : (
           filtered.map((inv) => <InvoiceCard key={inv.id} invoice={inv} />)

@@ -16,6 +16,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 import { useAppContext } from "@/context/AppContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 const WHATSAPP_NUMBER = "966XXXXXXXXX";
 const CLINIC_PHONE = "+966XXXXXXXXX";
@@ -56,13 +57,13 @@ function QuickAction({
 
 function UpcomingAppointmentCard() {
   const { appointments } = useAppContext();
-  const next = appointments.find(
-    (a) => a.status === "upcoming" && !a.checkedIn
-  );
+  const { t, language } = useLanguage();
+  const next = appointments.find((a) => a.status === "upcoming" && !a.checkedIn);
 
   if (!next) return null;
 
-  const formattedDate = new Date(next.date).toLocaleDateString("en-US", {
+  const locale = language === "ar" ? "ar-SA" : "en-US";
+  const formattedDate = new Date(next.date).toLocaleDateString(locale, {
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -81,7 +82,7 @@ function UpcomingAppointmentCard() {
       >
         <View style={styles.aptRow}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.aptLabel}>Next Appointment</Text>
+            <Text style={styles.aptLabel}>{t.nextAppointment}</Text>
             <Text style={styles.aptDoctor}>{next.doctorName}</Text>
             <Text style={styles.aptSpecialty}>{next.doctorSpecialty}</Text>
             <View style={styles.aptDateRow}>
@@ -92,9 +93,9 @@ function UpcomingAppointmentCard() {
           <View style={styles.aptActions}>
             <Pressable
               style={styles.aptChip}
-              onPress={() => router.push("/book-appointment")}
+              onPress={() => router.push("/(tabs)/appointments")}
             >
-              <Text style={styles.aptChipText}>Check In</Text>
+              <Text style={styles.aptChipText}>{t.checkIn}</Text>
             </Pressable>
           </View>
         </View>
@@ -106,6 +107,7 @@ function UpcomingAppointmentCard() {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { patient, appointments, invoices, questionnaires } = useAppContext();
+  const { t, language } = useLanguage();
   const pendingForms = questionnaires.filter((q) => q.status === "pending").length;
   const unpaidInvoices = invoices.filter((inv) => inv.status !== "paid").length;
 
@@ -119,6 +121,13 @@ export default function HomeScreen() {
     ]).start();
   }, []);
 
+  const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return t.goodMorning;
+    if (h < 17) return t.goodAfternoon;
+    return t.goodEvening;
+  };
+
   const openWhatsApp = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Linking.openURL(`whatsapp://send?phone=${WHATSAPP_NUMBER}`).catch(() =>
@@ -131,18 +140,19 @@ export default function HomeScreen() {
     Linking.openURL(`tel:${CLINIC_PHONE}`);
   };
 
+  const displayName = language === "ar" ? patient.nameAr : patient.name;
+
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
-      {/* Header */}
       <LinearGradient
         colors={[Colors.primaryDark, Colors.primary]}
         style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) + 16 }]}
       >
         <View style={styles.headerContent}>
-          <View>
-            <Text style={styles.greeting}>Good morning,</Text>
-            <Text style={styles.patientName}>{patient.name}</Text>
-            <Text style={styles.recordNum}>Record: {patient.recordNumber}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.greeting}>{getGreeting()}</Text>
+            <Text style={styles.patientName}>{displayName}</Text>
+            <Text style={styles.recordNum}>{t.record}: {patient.recordNumber}</Text>
           </View>
           <View style={styles.avatarWrap}>
             <LinearGradient colors={[Colors.accent, Colors.accentLight]} style={styles.avatar}>
@@ -168,19 +178,12 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-          {/* Upcoming appointment */}
           <UpcomingAppointmentCard />
 
-          {/* Alert banners */}
           {pendingForms > 0 && (
-            <Pressable
-              style={styles.alertBanner}
-              onPress={() => router.push("/(tabs)/health")}
-            >
+            <Pressable style={styles.alertBanner} onPress={() => router.push("/(tabs)/health")}>
               <Feather name="alert-circle" size={16} color={Colors.warning} />
-              <Text style={styles.alertText}>
-                You have {pendingForms} pending form{pendingForms > 1 ? "s" : ""} to complete
-              </Text>
+              <Text style={styles.alertText}>{t.pendingForms(pendingForms)}</Text>
               <Feather name="chevron-right" size={16} color={Colors.warning} />
             </Pressable>
           )}
@@ -191,63 +194,61 @@ export default function HomeScreen() {
             >
               <Feather name="file-text" size={16} color={Colors.danger} />
               <Text style={[styles.alertText, { color: Colors.danger }]}>
-                {unpaidInvoices} unpaid invoice{unpaidInvoices > 1 ? "s" : ""} pending payment
+                {t.unpaidInvoices(unpaidInvoices)}
               </Text>
               <Feather name="chevron-right" size={16} color={Colors.danger} />
             </Pressable>
           )}
 
-          {/* Quick actions */}
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <Text style={styles.sectionTitle}>{t.quickActions}</Text>
           <View style={styles.quickActionsGrid}>
             <QuickAction
               icon={<Feather name="calendar" size={22} color={Colors.primary} />}
-              label="Book"
+              label={t.book}
               onPress={() => router.push("/book-appointment")}
               bg="#EEF6FB"
             />
             <QuickAction
               icon={<Feather name="check-circle" size={22} color={Colors.success} />}
-              label="Check In"
+              label={t.checkIn}
               onPress={() => router.push("/(tabs)/appointments")}
               bg={Colors.successLight}
             />
             <QuickAction
               icon={<Feather name="credit-card" size={22} color={Colors.info} />}
-              label="Pay Bill"
+              label={t.payBill}
               onPress={() => router.push("/(tabs)/billing")}
               bg={Colors.infoLight}
             />
             <QuickAction
               icon={<MaterialCommunityIcons name="file-document-edit-outline" size={22} color={Colors.warning} />}
-              label="Request"
+              label={t.request}
               onPress={() => router.push("/request")}
               bg={Colors.warningLight}
             />
             <QuickAction
               icon={<Feather name="phone-call" size={22} color={Colors.primary} />}
-              label="Call Us"
+              label={t.callUs}
               onPress={callClinic}
               bg="#EEF6FB"
             />
             <QuickAction
               icon={<MaterialCommunityIcons name="whatsapp" size={22} color="#25D366" />}
-              label="WhatsApp"
+              label={t.whatsApp}
               onPress={openWhatsApp}
               bg="#E8F9EE"
             />
           </View>
 
-          {/* Contact section */}
-          <Text style={styles.sectionTitle}>Contact Clinic</Text>
+          <Text style={styles.sectionTitle}>{t.contactClinic}</Text>
           <View style={styles.contactRow}>
             <Pressable style={[styles.contactBtn, { backgroundColor: Colors.primary }]} onPress={callClinic}>
               <Feather name="phone" size={18} color="#fff" />
-              <Text style={styles.contactBtnText}>Call Clinic</Text>
+              <Text style={styles.contactBtnText}>{t.callClinic}</Text>
             </Pressable>
             <Pressable style={[styles.contactBtn, { backgroundColor: "#25D366" }]} onPress={openWhatsApp}>
               <MaterialCommunityIcons name="whatsapp" size={18} color="#fff" />
-              <Text style={styles.contactBtnText}>WhatsApp</Text>
+              <Text style={styles.contactBtnText}>{t.whatsAppChat}</Text>
             </Pressable>
           </View>
         </Animated.View>

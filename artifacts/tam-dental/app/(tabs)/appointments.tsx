@@ -16,6 +16,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 import { useAppContext, type Appointment } from "@/context/AppContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 const CLINIC_LAT = 24.7136;
 const CLINIC_LNG = 46.6753;
@@ -35,10 +36,11 @@ function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 function StatusBadge({ status }: { status: Appointment["status"] }) {
+  const { t } = useLanguage();
   const config = {
-    upcoming: { color: Colors.primary, bg: "#EEF6FB", label: "Upcoming" },
-    completed: { color: Colors.success, bg: Colors.successLight, label: "Completed" },
-    cancelled: { color: Colors.danger, bg: Colors.dangerLight, label: "Cancelled" },
+    upcoming: { color: Colors.primary, bg: "#EEF6FB", label: t.aptStatus_upcoming },
+    completed: { color: Colors.success, bg: Colors.successLight, label: t.aptStatus_completed },
+    cancelled: { color: Colors.danger, bg: Colors.dangerLight, label: t.aptStatus_cancelled },
   }[status];
   return (
     <View style={[styles.badge, { backgroundColor: config.bg }]}>
@@ -49,9 +51,11 @@ function StatusBadge({ status }: { status: Appointment["status"] }) {
 
 function AppointmentCard({ apt }: { apt: Appointment }) {
   const { checkinAppointment, cancelAppointment } = useAppContext();
+  const { t, language } = useLanguage();
   const [checkingIn, setCheckingIn] = useState(false);
 
-  const formattedDate = new Date(apt.date).toLocaleDateString("en-US", {
+  const locale = language === "ar" ? "ar-SA" : "en-US";
+  const formattedDate = new Date(apt.date).toLocaleDateString(locale, {
     weekday: "long",
     month: "long",
     day: "numeric",
@@ -67,7 +71,7 @@ function AppointmentCard({ apt }: { apt: Appointment }) {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Location Required", "Please enable location to check in.");
+        Alert.alert(t.locationRequired, t.locationRequiredMsg);
         setCheckingIn(false);
         return;
       }
@@ -77,27 +81,27 @@ function AppointmentCard({ apt }: { apt: Appointment }) {
       if (dist <= CHECKIN_RADIUS_KM) {
         checkinAppointment(apt.id);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        Alert.alert("Checked In!", "You have successfully checked in. Please proceed to reception.");
+        Alert.alert(t.checkinSuccess, t.checkinSuccessMsg);
       } else {
         Alert.alert(
-          "Too Far Away",
-          `You must be within ${CHECKIN_RADIUS_KM * 1000}m of the clinic to check in. You are currently ${(dist * 1000).toFixed(0)}m away.`
+          t.checkinTooFar,
+          t.checkinTooFarMsg(CHECKIN_RADIUS_KM * 1000, Math.round(dist * 1000))
         );
       }
     } catch {
-      Alert.alert("Error", "Unable to get your location. Please try again.");
+      Alert.alert(t.error, t.locationRequiredMsg);
     }
     setCheckingIn(false);
   };
 
   const handleCancel = () => {
     Alert.alert(
-      "Cancel Appointment",
-      `Are you sure you want to cancel your appointment with ${apt.doctorName} on ${formattedDate}?`,
+      t.cancelConfirmTitle,
+      t.cancelConfirmMsg(apt.doctorName, formattedDate),
       [
-        { text: "Keep", style: "cancel" },
+        { text: t.keepAppointment, style: "cancel" },
         {
-          text: "Cancel Appointment",
+          text: t.cancelAppointment,
           style: "destructive",
           onPress: () => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -156,20 +160,24 @@ function AppointmentCard({ apt }: { apt: Appointment }) {
           >
             <Feather name="map-pin" size={15} color="#fff" />
             <Text style={styles.checkinBtnText}>
-              {checkingIn ? "Locating..." : "Check In"}
+              {checkingIn ? t.checkingInText : t.checkInBtn}
             </Text>
           </Pressable>
-          {canCancel && (
+          {canCancel ? (
             <Pressable style={styles.cancelBtn} onPress={handleCancel}>
-              <Text style={styles.cancelBtnText}>Cancel</Text>
+              <Text style={styles.cancelBtnText}>{t.cancel}</Text>
             </Pressable>
-          )}
+          ) : apt.status === "upcoming" ? (
+            <View style={[styles.cancelBtn, { opacity: 0.4 }]}>
+              <Text style={[styles.cancelBtnText, { fontSize: 11 }]}>{t.cancelRestriction}</Text>
+            </View>
+          ) : null}
         </View>
       )}
       {apt.checkedIn && (
         <View style={styles.checkedInBadge}>
           <Feather name="check-circle" size={14} color={Colors.success} />
-          <Text style={styles.checkedInText}>Checked In</Text>
+          <Text style={styles.checkedInText}>{t.checkedIn}</Text>
         </View>
       )}
     </Pressable>
@@ -179,6 +187,7 @@ function AppointmentCard({ apt }: { apt: Appointment }) {
 export default function AppointmentsScreen() {
   const insets = useSafeAreaInsets();
   const { appointments } = useAppContext();
+  const { t } = useLanguage();
   const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
 
   const upcoming = appointments.filter((a) => a.status === "upcoming");
@@ -188,7 +197,7 @@ export default function AppointmentsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) + 16 }]}>
-        <Text style={styles.title}>Appointments</Text>
+        <Text style={styles.title}>{t.appointments}</Text>
         <Pressable
           style={styles.addBtn}
           onPress={() => {
@@ -201,17 +210,19 @@ export default function AppointmentsScreen() {
       </View>
 
       <View style={styles.tabBar}>
-        {(["upcoming", "past"] as const).map((t) => (
+        {(["upcoming", "past"] as const).map((tabKey) => (
           <Pressable
-            key={t}
-            style={[styles.tabBtn, tab === t && styles.tabBtnActive]}
+            key={tabKey}
+            style={[styles.tabBtn, tab === tabKey && styles.tabBtnActive]}
             onPress={() => {
-              setTab(t);
+              setTab(tabKey);
               Haptics.selectionAsync();
             }}
           >
-            <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>
-              {t === "upcoming" ? `Upcoming (${upcoming.length})` : `Past (${past.length})`}
+            <Text style={[styles.tabText, tab === tabKey && styles.tabTextActive]}>
+              {tabKey === "upcoming"
+                ? `${t.upcoming} (${upcoming.length})`
+                : `${t.past} (${past.length})`}
             </Text>
           </Pressable>
         ))}
@@ -228,13 +239,15 @@ export default function AppointmentsScreen() {
         {shown.length === 0 ? (
           <View style={styles.emptyState}>
             <Feather name="calendar" size={48} color={Colors.textMuted} />
-            <Text style={styles.emptyTitle}>No {tab} appointments</Text>
+            <Text style={styles.emptyTitle}>
+              {tab === "upcoming" ? t.noUpcomingApts : t.noPastApts}
+            </Text>
             {tab === "upcoming" && (
               <Pressable
                 style={styles.bookBtn}
                 onPress={() => router.push("/book-appointment")}
               >
-                <Text style={styles.bookBtnText}>Book an Appointment</Text>
+                <Text style={styles.bookBtnText}>{t.bookAppointment}</Text>
               </Pressable>
             )}
           </View>
@@ -326,15 +339,16 @@ const styles = StyleSheet.create({
   },
   checkinBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 14, color: "#fff" },
   cancelBtn: {
-    paddingHorizontal: 18,
+    paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 10,
     borderWidth: 1.5,
     borderColor: Colors.border,
     alignItems: "center",
     justifyContent: "center",
+    maxWidth: 140,
   },
-  cancelBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 14, color: Colors.danger },
+  cancelBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 13, color: Colors.danger, textAlign: "center" },
   checkedInBadge: {
     flexDirection: "row",
     alignItems: "center",
