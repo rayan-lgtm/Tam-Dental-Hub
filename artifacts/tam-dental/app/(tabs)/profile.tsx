@@ -4,6 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React from "react";
 import {
+  Alert,
   Linking,
   Platform,
   Pressable,
@@ -57,7 +58,7 @@ function MenuItem({
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const { patient, questionnaires, invoices } = useAppContext();
+  const { patient, questionnaires, invoices, familyMembers, removeFamilyMember } = useAppContext();
   const { t, language, toggleLanguage } = useLanguage();
   const pendingForms = questionnaires.filter((q) => q.status === "pending").length;
   const unpaidInvoices = invoices.filter((inv) => inv.status !== "paid").length;
@@ -72,6 +73,21 @@ export default function ProfileScreen() {
     Linking.openURL(`whatsapp://send?phone=${WHATSAPP_NUMBER}`).catch(() =>
       Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}`)
     );
+  };
+
+  const handleRemoveMember = (id: string, name: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Alert.alert(t.removeMemberConfirm, t.removeMemberMsg(name), [
+      { text: t.cancel, style: "cancel" },
+      {
+        text: t.removeMember,
+        style: "destructive",
+        onPress: () => {
+          removeFamilyMember(id);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        },
+      },
+    ]);
   };
 
   const displayName = language === "ar" ? patient.nameAr : patient.name;
@@ -141,6 +157,95 @@ export default function ProfileScreen() {
             <Text style={styles.contactLabel}>{t.whatsAppChat}</Text>
           </Pressable>
         </View>
+
+        {/* Family Members */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{t.familyMembers}</Text>
+          <Pressable
+            style={styles.addFamilyBtn}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push("/add-family-member");
+            }}
+          >
+            <Feather name="user-plus" size={14} color={Colors.primary} />
+            <Text style={styles.addFamilyBtnText}>{t.addFamilyMember}</Text>
+          </Pressable>
+        </View>
+
+        {familyMembers.length === 0 ? (
+          <View style={styles.emptyFamily}>
+            <View style={styles.emptyFamilyIconWrap}>
+              <MaterialCommunityIcons name="account-group-outline" size={32} color={Colors.textMuted} />
+            </View>
+            <Text style={styles.emptyFamilyText}>{t.noFamilyMembers}</Text>
+            <Text style={styles.emptyFamilyHint}>{t.noFamilyMembersHint}</Text>
+            <Pressable
+              style={styles.emptyAddBtn}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push("/add-family-member");
+              }}
+            >
+              <Feather name="plus" size={16} color={Colors.primary} />
+              <Text style={styles.emptyAddBtnText}>{t.addFamilyMember}</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View style={styles.menuGroup}>
+            {familyMembers.map((member, idx) => (
+              <View key={member.id}>
+                {idx > 0 && <View style={styles.menuDivider} />}
+                <View style={styles.familyMemberRow}>
+                  <View style={styles.familyAvatar}>
+                    <Text style={styles.familyAvatarText}>
+                      {member.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+                    </Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.familyName}>
+                      {language === "ar" ? member.nameAr : member.name}
+                    </Text>
+                    <View style={styles.familyMeta}>
+                      <View style={styles.familyRelBadge}>
+                        <Text style={styles.familyRelText}>
+                          {language === "ar" ? member.relationshipAr : member.relationship}
+                        </Text>
+                      </View>
+                      <Text style={styles.familyId}>••••{member.idNumber.slice(-4)}</Text>
+                    </View>
+                  </View>
+                  <Pressable
+                    style={styles.removeBtn}
+                    onPress={() =>
+                      handleRemoveMember(
+                        member.id,
+                        language === "ar" ? member.nameAr : member.name
+                      )
+                    }
+                    hitSlop={8}
+                  >
+                    <Feather name="trash-2" size={16} color={Colors.danger} />
+                  </Pressable>
+                </View>
+              </View>
+            ))}
+            <View style={styles.menuDivider} />
+            <Pressable
+              style={styles.addAnotherRow}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push("/add-family-member");
+              }}
+            >
+              <View style={[styles.menuIcon, { backgroundColor: "#EEF6FB" }]}>
+                <Feather name="user-plus" size={20} color={Colors.primary} />
+              </View>
+              <Text style={styles.addAnotherText}>{t.addFamilyMember}</Text>
+              <Feather name="chevron-right" size={18} color={Colors.textMuted} />
+            </Pressable>
+          </View>
+        )}
 
         {/* My Records */}
         <Text style={styles.sectionTitle}>{t.myRecords}</Text>
@@ -316,7 +421,68 @@ const styles = StyleSheet.create({
   contactBtn: { flex: 1, alignItems: "center", paddingVertical: 16, gap: 6 },
   contactLabel: { fontFamily: "Inter_500Medium", fontSize: 13, color: Colors.textSecondary },
   contactDivider: { width: 1, backgroundColor: Colors.borderLight, marginVertical: 12 },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
   sectionTitle: { fontFamily: "Inter_700Bold", fontSize: 16, color: Colors.text, marginBottom: 10 },
+  addFamilyBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "#EEF6FB",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginBottom: 10,
+  },
+  addFamilyBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 13, color: Colors.primary },
+  emptyFamily: {
+    backgroundColor: Colors.backgroundCard,
+    borderRadius: 16,
+    padding: 24,
+    alignItems: "center",
+    marginBottom: 20,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    borderStyle: "dashed",
+  },
+  emptyFamilyIconWrap: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: Colors.backgroundMuted,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  emptyFamilyText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 15,
+    color: Colors.text,
+    marginBottom: 6,
+  },
+  emptyFamilyHint: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 13,
+    color: Colors.textSecondary,
+    textAlign: "center",
+    lineHeight: 19,
+    marginBottom: 16,
+  },
+  emptyAddBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    borderRadius: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+  },
+  emptyAddBtnText: { fontFamily: "Inter_600SemiBold", fontSize: 14, color: Colors.primary },
   menuGroup: {
     backgroundColor: Colors.backgroundCard,
     borderRadius: 16,
@@ -342,6 +508,71 @@ const styles = StyleSheet.create({
   menuDivider: { height: 1, backgroundColor: Colors.borderLight, marginLeft: 70 },
   badgeWrap: { backgroundColor: Colors.danger, borderRadius: 12, minWidth: 22, height: 22, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
   badgeNum: { fontFamily: "Inter_700Bold", fontSize: 11, color: "#fff" },
+  familyMemberRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 14,
+    gap: 12,
+  },
+  familyAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.primary + "20",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1.5,
+    borderColor: Colors.primary + "40",
+  },
+  familyAvatarText: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 15,
+    color: Colors.primary,
+  },
+  familyName: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 15,
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  familyMeta: { flexDirection: "row", alignItems: "center", gap: 8 },
+  familyRelBadge: {
+    backgroundColor: Colors.primary + "18",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  familyRelText: {
+    fontFamily: "Inter_500Medium",
+    fontSize: 11,
+    color: Colors.primary,
+  },
+  familyId: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 12,
+    color: Colors.textMuted,
+    letterSpacing: 1,
+  },
+  removeBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.dangerLight,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addAnotherRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    gap: 14,
+  },
+  addAnotherText: {
+    flex: 1,
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 15,
+    color: Colors.primary,
+  },
   langBadge: {
     backgroundColor: Colors.primary,
     borderRadius: 8,

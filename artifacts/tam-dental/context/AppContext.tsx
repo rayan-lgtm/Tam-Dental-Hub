@@ -50,16 +50,29 @@ export type Questionnaire = {
   dueDate: string;
 };
 
+export type FamilyMember = {
+  id: string;
+  idNumber: string;
+  name: string;
+  nameAr: string;
+  relationship: string;
+  relationshipAr: string;
+  addedDate: string;
+};
+
 type AppContextType = {
   patient: Patient;
   appointments: Appointment[];
   invoices: Invoice[];
   prescriptions: Prescription[];
   questionnaires: Questionnaire[];
+  familyMembers: FamilyMember[];
   checkinAppointment: (id: string) => void;
   cancelAppointment: (id: string) => void;
   confirmAppointment: (id: string) => void;
   payInvoice: (id: string) => void;
+  addFamilyMember: (member: Omit<FamilyMember, "id" | "addedDate">) => void;
+  removeFamilyMember: (id: string) => void;
 };
 
 const MOCK_PATIENT: Patient = {
@@ -192,11 +205,24 @@ const MOCK_QUESTIONNAIRES: Questionnaire[] = [
   },
 ];
 
+const STORAGE_KEY_FAMILY = "@tam_dental_family_members";
+
 const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [appointments, setAppointments] = useState<Appointment[]>(MOCK_APPOINTMENTS);
   const [invoices, setInvoices] = useState<Invoice[]>(MOCK_INVOICES);
+  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
+
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY_FAMILY).then((data) => {
+      if (data) setFamilyMembers(JSON.parse(data));
+    });
+  }, []);
+
+  const persistFamily = useCallback((members: FamilyMember[]) => {
+    AsyncStorage.setItem(STORAGE_KEY_FAMILY, JSON.stringify(members));
+  }, []);
 
   const checkinAppointment = useCallback((id: string) => {
     setAppointments((prev) =>
@@ -222,6 +248,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
+  const addFamilyMember = useCallback(
+    (member: Omit<FamilyMember, "id" | "addedDate">) => {
+      const newMember: FamilyMember = {
+        ...member,
+        id: `FM-${Date.now()}`,
+        addedDate: new Date().toISOString().split("T")[0],
+      };
+      setFamilyMembers((prev) => {
+        const updated = [...prev, newMember];
+        persistFamily(updated);
+        return updated;
+      });
+    },
+    [persistFamily]
+  );
+
+  const removeFamilyMember = useCallback(
+    (id: string) => {
+      setFamilyMembers((prev) => {
+        const updated = prev.filter((m) => m.id !== id);
+        persistFamily(updated);
+        return updated;
+      });
+    },
+    [persistFamily]
+  );
+
   return (
     <AppContext.Provider
       value={{
@@ -230,10 +283,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         invoices,
         prescriptions: MOCK_PRESCRIPTIONS,
         questionnaires: MOCK_QUESTIONNAIRES,
+        familyMembers,
         checkinAppointment,
         cancelAppointment,
         confirmAppointment,
         payInvoice,
+        addFamilyMember,
+        removeFamilyMember,
       }}
     >
       {children}
