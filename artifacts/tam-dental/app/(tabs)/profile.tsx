@@ -16,6 +16,7 @@ import { Text } from "@/components/Text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/colors";
 import { useAppContext } from "@/context/AppContext";
+import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 
 const CLINIC_PHONE = "+966XXXXXXXXX";
@@ -61,6 +62,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { patient, questionnaires, invoices, familyMembers, removeFamilyMember } = useAppContext();
   const { t, language, isRTL, toggleLanguage } = useLanguage();
+  const { logout } = useAuth();
   const pendingForms = questionnaires.filter((q) => q.status === "pending").length;
   const unpaidInvoices = invoices.filter((inv) => inv.status !== "paid").length;
 
@@ -74,6 +76,20 @@ export default function ProfileScreen() {
     Linking.openURL(`whatsapp://send?phone=${WHATSAPP_NUMBER}`).catch(() =>
       Linking.openURL(`https://wa.me/${WHATSAPP_NUMBER}`)
     );
+  };
+
+  const handleSignOut = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Alert.alert(t.loginSignOutConfirm, t.loginSignOutMsg, [
+      { text: t.cancel, style: "cancel" },
+      {
+        text: t.loginSignOut,
+        style: "destructive",
+        onPress: () => {
+          logout();
+        },
+      },
+    ]);
   };
 
   const handleRemoveMember = (id: string, name: string) => {
@@ -342,6 +358,12 @@ export default function ProfileScreen() {
           </Pressable>
         </View>
 
+        {/* Sign Out */}
+        <Pressable style={styles.signOutBtn} onPress={handleSignOut}>
+          <Feather name="log-out" size={18} color="#DC2626" />
+          <Text style={styles.signOutText}>{t.loginSignOut}</Text>
+        </Pressable>
+
         <View style={styles.versionBox}>
           <Text style={styles.versionText}>{t.appVersion}</Text>
           <Text style={styles.versionSub}>{t.website}</Text>
@@ -582,6 +604,21 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   langBadgeText: { fontFamily: "Inter_700Bold", fontSize: 12, color: "#fff" },
+  signOutBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    backgroundColor: "#FEE2E2",
+    borderRadius: 14,
+    paddingVertical: 15,
+    marginBottom: 12,
+  },
+  signOutText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 15,
+    color: "#DC2626",
+  },
   versionBox: { alignItems: "center", paddingVertical: 24 },
   versionText: { fontFamily: "Inter_400Regular", fontSize: 13, color: Colors.textMuted },
   versionSub: { fontFamily: "Inter_400Regular", fontSize: 12, color: Colors.textMuted, marginTop: 2 },

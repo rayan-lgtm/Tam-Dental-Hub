@@ -20,6 +20,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AppProvider } from "@/context/AppContext";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { LanguageProvider, useLanguage } from "@/context/LanguageContext";
 
 SplashScreen.preventAutoHideAsync();
@@ -36,9 +37,14 @@ function AppContent({ children }: { children: ReactNode }) {
 }
 
 function RootLayoutNav() {
+  const { isAuthLoading } = useAuth();
+
+  if (isAuthLoading) return null;
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="login" options={{ headerShown: false, animation: "fade" }} />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false, animation: "fade" }} />
       <Stack.Screen name="appointment/[id]" options={{ presentation: "card" }} />
       <Stack.Screen name="book-appointment" options={{ presentation: "modal" }} />
       <Stack.Screen name="invoice/[id]" options={{ presentation: "card" }} />
@@ -74,13 +80,15 @@ export default function RootLayout() {
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <LanguageProvider>
-            <AppProvider>
-              <AppContent>
-                <KeyboardProvider>
-                  <RootLayoutNav />
-                </KeyboardProvider>
-              </AppContent>
-            </AppProvider>
+            <AuthProvider>
+              <AppProvider>
+                <AppContent>
+                  <KeyboardProvider>
+                    <RootLayoutNav />
+                  </KeyboardProvider>
+                </AppContent>
+              </AppProvider>
+            </AuthProvider>
           </LanguageProvider>
         </QueryClientProvider>
       </ErrorBoundary>
