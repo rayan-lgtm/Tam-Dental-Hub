@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/"
+title = "TAM Dental Patient App"
+version = "1.0.0"
+id = "artifacts/tam-dental"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+localPort = 22570
+name = "expo"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/tam-dental run dev"
+
+[services.env]
+PORT = "22570"
+BASE_PATH = "/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/tam-dental", "run", "build"]
+run = ["pnpm", "--filter", "@workspace/tam-dental", "run", "serve"]
