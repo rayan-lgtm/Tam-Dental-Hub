@@ -107,7 +107,7 @@ function UpcomingAppointmentCard() {
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { patient, appointments, invoices, questionnaires } = useAppContext();
-  const { t, language } = useLanguage();
+  const { t, language, isRTL } = useLanguage();
   const pendingForms = questionnaires.filter((q) => q.status === "pending").length;
   const unpaidInvoices = invoices.filter((inv) => inv.status !== "paid").length;
 
@@ -184,7 +184,7 @@ export default function HomeScreen() {
             <Pressable style={styles.alertBanner} onPress={() => router.push("/(tabs)/health")}>
               <Feather name="alert-circle" size={16} color={Colors.warning} />
               <Text style={styles.alertText}>{t.pendingForms(pendingForms)}</Text>
-              <Feather name="chevron-right" size={16} color={Colors.warning} />
+              <Feather name={isRTL ? "chevron-left" : "chevron-right"} size={16} color={Colors.warning} />
             </Pressable>
           )}
           {unpaidInvoices > 0 && (
@@ -196,7 +196,7 @@ export default function HomeScreen() {
               <Text style={[styles.alertText, { color: Colors.danger }]}>
                 {t.unpaidInvoices(unpaidInvoices)}
               </Text>
-              <Feather name="chevron-right" size={16} color={Colors.danger} />
+              <Feather name={isRTL ? "chevron-left" : "chevron-right"} size={16} color={Colors.danger} />
             </Pressable>
           )}
 

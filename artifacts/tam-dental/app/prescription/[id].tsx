@@ -19,7 +19,7 @@ export default function PrescriptionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { prescriptions } = useAppContext();
-  const { t, language } = useLanguage();
+  const { t, language, isRTL } = useLanguage();
   const rx = prescriptions.find((p) => p.id === id);
 
   if (!rx) {
@@ -36,7 +36,7 @@ export default function PrescriptionScreen() {
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) + 8 }]}>
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Feather name="arrow-left" size={22} color={Colors.text} />
+          <Feather name={isRTL ? "arrow-right" : "arrow-left"} size={22} color={Colors.text} />
         </Pressable>
         <Text style={styles.headerTitle}>{t.prescriptions}</Text>
         <View style={styles.backBtn} />
@@ -189,8 +189,8 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 16,
     marginBottom: 2,
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.primary,
+    borderStartWidth: 4,
+    borderStartColor: Colors.primary,
     elevation: 1,
     shadowColor: "#000",
     shadowOpacity: 0.04,

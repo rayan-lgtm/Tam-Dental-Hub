@@ -16,7 +16,7 @@ import { useAppContext } from "@/context/AppContext";
 import { useLanguage } from "@/context/LanguageContext";
 
 function PrescriptionCard({ rx }: { rx: ReturnType<typeof useAppContext>["prescriptions"][0] }) {
-  const { t, language } = useLanguage();
+  const { t, language, isRTL } = useLanguage();
   const locale = language === "ar" ? "ar-SA" : "en-US";
   return (
     <Pressable
@@ -41,14 +41,14 @@ function PrescriptionCard({ rx }: { rx: ReturnType<typeof useAppContext>["prescr
           <Text style={styles.medCountNum}>{rx.medications.length}</Text>
           <Text style={styles.medCountLabel}>{t.medications.slice(0, 4)}</Text>
         </View>
-        <Feather name="chevron-right" size={18} color={Colors.textMuted} />
+        <Feather name={isRTL ? "chevron-left" : "chevron-right"} size={18} color={Colors.textMuted} />
       </View>
     </Pressable>
   );
 }
 
 function QuestionnaireCard({ q }: { q: ReturnType<typeof useAppContext>["questionnaires"][0] }) {
-  const { t, language } = useLanguage();
+  const { t, language, isRTL } = useLanguage();
   const locale = language === "ar" ? "ar-SA" : "en-US";
 
   const typeConfig = {
@@ -83,7 +83,7 @@ function QuestionnaireCard({ q }: { q: ReturnType<typeof useAppContext>["questio
             {q.status === "completed" ? t.done : t.loading.slice(0, 7)}
           </Text>
         </View>
-        <Feather name="chevron-right" size={18} color={Colors.textMuted} />
+        <Feather name={isRTL ? "chevron-left" : "chevron-right"} size={18} color={Colors.textMuted} />
       </View>
     </Pressable>
   );

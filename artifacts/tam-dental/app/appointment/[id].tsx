@@ -37,7 +37,7 @@ export default function AppointmentDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { appointments, checkinAppointment, cancelAppointment, confirmAppointment } = useAppContext();
-  const { t, language } = useLanguage();
+  const { t, language, isRTL } = useLanguage();
   const apt = appointments.find((a) => a.id === id);
   const [checkingIn, setCheckingIn] = useState(false);
 
@@ -129,7 +129,7 @@ export default function AppointmentDetailScreen() {
         style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) + 8 }]}
       >
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Feather name="arrow-left" size={22} color="#fff" />
+          <Feather name={isRTL ? "arrow-right" : "arrow-left"} size={22} color="#fff" />
         </Pressable>
         <Text style={styles.headerTitle}>{t.appointments}</Text>
         <View style={styles.backBtn} />

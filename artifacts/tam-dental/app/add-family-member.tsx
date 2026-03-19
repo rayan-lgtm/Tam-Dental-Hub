@@ -56,7 +56,7 @@ type Step = "form" | "verifying" | "found" | "error";
 export default function AddFamilyMemberScreen() {
   const insets = useSafeAreaInsets();
   const { addFamilyMember, familyMembers } = useAppContext();
-  const { t, language } = useLanguage();
+  const { t, language, isRTL } = useLanguage();
 
   const [step, setStep] = useState<Step>("form");
   const [idNumber, setIdNumber] = useState("");
@@ -322,7 +322,7 @@ export default function AddFamilyMemberScreen() {
 
             <View style={styles.actionRow}>
               <Pressable style={styles.retryBtn} onPress={handleReset}>
-                <Feather name="arrow-left" size={16} color={Colors.textSecondary} />
+                <Feather name={isRTL ? "arrow-right" : "arrow-left"} size={16} color={Colors.textSecondary} />
                 <Text style={styles.retryBtnText}>{t.startOver}</Text>
               </Pressable>
               <Pressable

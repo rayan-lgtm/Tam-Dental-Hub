@@ -13,18 +13,27 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
+import React, { useEffect, ReactNode } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AppProvider } from "@/context/AppContext";
-import { LanguageProvider } from "@/context/LanguageContext";
+import { LanguageProvider, useLanguage } from "@/context/LanguageContext";
 
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
+
+function AppContent({ children }: { children: ReactNode }) {
+  const { isRTL } = useLanguage();
+  return (
+    <GestureHandlerRootView style={{ flex: 1, direction: isRTL ? "rtl" : "ltr" }}>
+      {children}
+    </GestureHandlerRootView>
+  );
+}
 
 function RootLayoutNav() {
   return (
@@ -66,11 +75,11 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <LanguageProvider>
             <AppProvider>
-              <GestureHandlerRootView style={{ flex: 1 }}>
+              <AppContent>
                 <KeyboardProvider>
                   <RootLayoutNav />
                 </KeyboardProvider>
-              </GestureHandlerRootView>
+              </AppContent>
             </AppProvider>
           </LanguageProvider>
         </QueryClientProvider>

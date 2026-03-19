@@ -58,7 +58,7 @@ export default function QuestionnaireScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { questionnaires } = useAppContext();
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const form = QUESTIONNAIRES_DATA[id ?? ""];
   const q = questionnaires.find((q) => q.id === id);
 
@@ -90,7 +90,7 @@ export default function QuestionnaireScreen() {
       <View style={[styles.container, { backgroundColor: Colors.background }]}>
         <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) + 8 }]}>
           <Pressable style={styles.backBtn} onPress={() => router.back()}>
-            <Feather name="arrow-left" size={22} color={Colors.text} />
+            <Feather name={isRTL ? "arrow-right" : "arrow-left"} size={22} color={Colors.text} />
           </Pressable>
           <Text style={styles.headerTitle}>{form.title}</Text>
           <View style={styles.backBtn} />
@@ -113,7 +113,7 @@ export default function QuestionnaireScreen() {
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) + 8 }]}>
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Feather name="arrow-left" size={22} color={Colors.text} />
+          <Feather name={isRTL ? "arrow-right" : "arrow-left"} size={22} color={Colors.text} />
         </Pressable>
         <Text style={styles.headerTitle}>{form.title}</Text>
         <View style={styles.backBtn} />

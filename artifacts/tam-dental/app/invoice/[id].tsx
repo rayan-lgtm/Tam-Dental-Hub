@@ -21,7 +21,7 @@ export default function InvoiceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { invoices, payInvoice } = useAppContext();
-  const { t, language } = useLanguage();
+  const { t, language, isRTL } = useLanguage();
   const invoice = invoices.find((inv) => inv.id === id);
 
   if (!invoice) {
@@ -61,7 +61,7 @@ export default function InvoiceDetailScreen() {
     <View style={[styles.container, { backgroundColor: Colors.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) + 8 }]}>
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Feather name="arrow-left" size={22} color={Colors.text} />
+          <Feather name={isRTL ? "arrow-right" : "arrow-left"} size={22} color={Colors.text} />
         </Pressable>
         <Text style={styles.headerTitle}>{t.billing}</Text>
         <View style={styles.backBtn} />

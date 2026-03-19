@@ -38,6 +38,7 @@ function MenuItem({
   badge?: number;
   rightContent?: React.ReactNode;
 }) {
+  const { isRTL } = useLanguage();
   return (
     <Pressable style={styles.menuItem} onPress={onPress}>
       <View style={[styles.menuIcon, danger && { backgroundColor: Colors.dangerLight }]}>{icon}</View>
@@ -51,7 +52,7 @@ function MenuItem({
           <Text style={styles.badgeNum}>{badge}</Text>
         </View>
       ) : null}
-      <Feather name="chevron-right" size={18} color={Colors.textMuted} />
+      <Feather name={isRTL ? "chevron-left" : "chevron-right"} size={18} color={Colors.textMuted} />
     </Pressable>
   );
 }
@@ -59,7 +60,7 @@ function MenuItem({
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { patient, questionnaires, invoices, familyMembers, removeFamilyMember } = useAppContext();
-  const { t, language, toggleLanguage } = useLanguage();
+  const { t, language, isRTL, toggleLanguage } = useLanguage();
   const pendingForms = questionnaires.filter((q) => q.status === "pending").length;
   const unpaidInvoices = invoices.filter((inv) => inv.status !== "paid").length;
 
@@ -242,7 +243,7 @@ export default function ProfileScreen() {
                 <Feather name="user-plus" size={20} color={Colors.primary} />
               </View>
               <Text style={styles.addAnotherText}>{t.addFamilyMember}</Text>
-              <Feather name="chevron-right" size={18} color={Colors.textMuted} />
+              <Feather name={isRTL ? "chevron-left" : "chevron-right"} size={18} color={Colors.textMuted} />
             </Pressable>
           </View>
         )}
@@ -505,7 +506,7 @@ const styles = StyleSheet.create({
   },
   menuLabel: { fontFamily: "Inter_600SemiBold", fontSize: 15, color: Colors.text },
   menuSublabel: { fontFamily: "Inter_400Regular", fontSize: 12, color: Colors.textSecondary, marginTop: 1 },
-  menuDivider: { height: 1, backgroundColor: Colors.borderLight, marginLeft: 70 },
+  menuDivider: { height: 1, backgroundColor: Colors.borderLight, marginStart: 70 },
   badgeWrap: { backgroundColor: Colors.danger, borderRadius: 12, minWidth: 22, height: 22, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
   badgeNum: { fontFamily: "Inter_700Bold", fontSize: 11, color: "#fff" },
   familyMemberRow: {
