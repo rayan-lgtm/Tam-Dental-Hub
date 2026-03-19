@@ -5,37 +5,40 @@ import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
 import { SymbolView } from "expo-symbols";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
-import { Platform, StyleSheet, View, useColorScheme } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { Colors } from "@/constants/colors";
+import { useLanguage } from "@/context/LanguageContext";
 
 function NativeTabLayout() {
+  const { t } = useLanguage();
   return (
     <NativeTabs>
       <NativeTabs.Trigger name="index">
         <Icon sf={{ default: "house", selected: "house.fill" }} />
-        <Label>Home</Label>
+        <Label>{t.tabHome}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="appointments">
         <Icon sf={{ default: "calendar", selected: "calendar.badge.clock" }} />
-        <Label>Appointments</Label>
+        <Label>{t.tabAppointments}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="health">
         <Icon sf={{ default: "heart", selected: "heart.fill" }} />
-        <Label>Health</Label>
+        <Label>{t.tabHealth}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="billing">
         <Icon sf={{ default: "creditcard", selected: "creditcard.fill" }} />
-        <Label>Billing</Label>
+        <Label>{t.tabBilling}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
         <Icon sf={{ default: "person", selected: "person.fill" }} />
-        <Label>Profile</Label>
+        <Label>{t.tabProfile}</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
 }
 
 function ClassicTabLayout() {
+  const { t } = useLanguage();
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
 
@@ -72,7 +75,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: t.tabHome,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="house" tintColor={color} size={22} />
@@ -84,7 +87,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="appointments"
         options={{
-          title: "Appointments",
+          title: t.tabAppointments,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="calendar" tintColor={color} size={22} />
@@ -96,7 +99,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="health"
         options={{
-          title: "Health",
+          title: t.tabHealth,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="heart" tintColor={color} size={22} />
@@ -108,7 +111,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="billing"
         options={{
-          title: "Billing",
+          title: t.tabBilling,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="creditcard" tintColor={color} size={22} />
@@ -120,7 +123,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profile",
+          title: t.tabProfile,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="person" tintColor={color} size={22} />
