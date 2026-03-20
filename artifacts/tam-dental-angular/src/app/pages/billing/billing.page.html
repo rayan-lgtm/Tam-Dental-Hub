@@ -1,0 +1,52 @@
+<ion-header [attr.dir]="langService.dir">
+  <ion-toolbar>
+    <ion-title>{{ langService.t('billing') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [attr.dir]="langService.dir">
+  <div class="billing-content">
+
+    <!-- Total due card -->
+    <div class="total-card" *ngIf="totalDue > 0">
+      <div class="total-label">{{ langService.t('totalDue') }}</div>
+      <div class="total-amount">{{ totalDue | number:'1.0-0' }} SAR</div>
+      <div class="total-sub">{{ invoices.length }} {{ langService.t('invoices') }}</div>
+    </div>
+
+    <!-- Invoice list -->
+    <div class="section-title">{{ langService.t('invoices') }}</div>
+    <div class="tam-card inv-card" *ngFor="let inv of invoices">
+      <div class="inv-top">
+        <div>
+          <div class="inv-id">{{ inv.id }}</div>
+          <div class="inv-desc">{{ inv.description }}</div>
+          <div class="inv-date">{{ inv.date }}</div>
+        </div>
+        <div class="inv-right">
+          <span class="badge" [ngClass]="statusClass(inv.status)">{{ statusLabel(inv.status) }}</span>
+          <div class="inv-amount">{{ inv.amount | number:'1.0-0' }} {{ inv.currency }}</div>
+        </div>
+      </div>
+
+      <!-- Items -->
+      <div class="inv-items">
+        <div class="inv-item" *ngFor="let item of inv.items">
+          <span>{{ item.name }}</span>
+          <span>{{ item.amount | number:'1.0-0' }} {{ inv.currency }}</span>
+        </div>
+      </div>
+
+      <button class="pay-btn" *ngIf="inv.status !== 'paid'" (click)="payInvoice(inv)">
+        <ion-icon name="card-outline"></ion-icon>
+        {{ langService.t('payNow') }}
+      </button>
+    </div>
+
+    <div class="empty-state" *ngIf="invoices.length === 0">
+      <ion-icon name="card-outline"></ion-icon>
+      <p>{{ langService.isRTL ? 'لا توجد فواتير' : 'No invoices found' }}</p>
+    </div>
+
+  </div>
+</ion-content>

@@ -1,0 +1,116 @@
+<ion-content [attr.dir]="langService.dir" scroll-y="false">
+  <div class="login-wrap">
+
+    <!-- Blue header -->
+    <div class="login-header">
+      <div class="logo-row">
+        <img src="assets/images/icon.png" class="logo-img" alt="TAM Dental" />
+        <div>
+          <div class="logo-name">TAM Dental</div>
+          <div class="logo-name-ar">عيادات تام للأسنان</div>
+        </div>
+      </div>
+      <div class="hero-title">{{ langService.t('loginWelcome') }}</div>
+      <div class="hero-sub">{{ langService.t('loginSubtitle') }}</div>
+      <div class="step-row">
+        <span class="step-dot" [class.active]="step === 'phone'"></span>
+        <span class="step-line"></span>
+        <span class="step-dot" [class.active]="step === 'otp'"></span>
+      </div>
+    </div>
+
+    <!-- White card -->
+    <div class="login-card">
+
+      <!-- STEP: phone -->
+      <ng-container *ngIf="step === 'phone'">
+        <div class="card-title">{{ langService.t('loginSignIn') }}</div>
+        <div class="card-sub">{{ langService.t('loginPhonePrompt') }}</div>
+
+        <label class="field-label">{{ langService.t('loginPhone') }}</label>
+        <div class="phone-row">
+          <div class="country-pill">
+            <span class="flag">🇸🇦</span>
+            <span class="cc-text">+966</span>
+          </div>
+          <input
+            type="tel"
+            class="phone-input"
+            [placeholder]="langService.t('loginPhonePlaceholder')"
+            [(ngModel)]="phone"
+            (ngModelChange)="onPhoneChange($event)"
+            maxlength="10"
+            (keyup.enter)="sendOtp()"
+          />
+          <ion-icon name="checkmark-circle" class="valid-icon" *ngIf="isPhoneValid"></ion-icon>
+        </div>
+
+        <button class="primary-btn" [disabled]="!isPhoneValid || sending" (click)="sendOtp()">
+          <ion-icon name="send-outline" *ngIf="!sending"></ion-icon>
+          {{ sending ? langService.t('loginSendingOtp') : langService.t('loginSendOtp') }}
+        </button>
+
+        <div class="demo-hint">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span>{{ langService.t('loginDemoNote') }}</span>
+        </div>
+      </ng-container>
+
+      <!-- STEP: OTP -->
+      <ng-container *ngIf="step === 'otp'">
+        <button class="back-btn" [class.rtl]="langService.isRTL" (click)="goBack()">
+          <ion-icon [name]="langService.isRTL ? 'arrow-forward-outline' : 'arrow-back-outline'"></ion-icon>
+          {{ langService.t('back') }}
+        </button>
+
+        <div class="card-title">{{ langService.t('loginOtpLabel') }}</div>
+        <div class="card-sub">
+          {{ langService.isRTL
+            ? 'أدخل الرمز المكوّن من 6 أرقام المُرسَل إلى +966' + phone
+            : 'Enter the 6-digit code sent to +966 ' + phone }}
+        </div>
+
+        <!-- OTP boxes -->
+        <div class="otp-area" (click)="focusOtpInput()">
+          <input
+            #otpInput
+            type="tel"
+            class="otp-hidden"
+            [(ngModel)]="otp"
+            (ngModelChange)="onOtpChange($event)"
+            maxlength="6"
+            autocomplete="one-time-code"
+          />
+          <div class="otp-boxes">
+            <div
+              *ngFor="let _ of otpSlots; let i = index"
+              class="otp-box"
+              [class.filled]="!!otp[i]"
+              [class.focused]="otp.length === i"
+            >
+              <span>{{ otp[i] || '' }}</span>
+              <span class="cursor" *ngIf="otp.length === i && !otp[i]"></span>
+            </div>
+          </div>
+        </div>
+
+        <button class="primary-btn" [disabled]="otp.length < 6 || verifying" (click)="verifyOtp()">
+          <ion-icon name="shield-checkmark-outline" *ngIf="!verifying"></ion-icon>
+          {{ verifying ? langService.t('loginVerifying') : langService.t('loginVerify') }}
+        </button>
+
+        <button class="resend-btn" [disabled]="countdown > 0" (click)="resendOtp()">
+          {{ countdown > 0
+            ? (langService.isRTL ? 'إعادة الإرسال خلال ' + countdown + ' ث' : 'Resend in ' + countdown + 's')
+            : langService.t('loginResend') }}
+        </button>
+
+        <div class="demo-hint">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span>{{ langService.t('loginDemoNote') }}</span>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+</ion-content>

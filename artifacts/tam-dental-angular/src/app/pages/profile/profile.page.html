@@ -1,0 +1,108 @@
+<ion-header [attr.dir]="langService.dir">
+  <ion-toolbar>
+    <ion-title>{{ langService.t('profile') }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleLanguage()" fill="clear">
+        <ion-icon name="language-outline"></ion-icon>
+        <span class="lang-label">{{ langService.language === 'en' ? 'AR' : 'EN' }}</span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [attr.dir]="langService.dir">
+
+  <!-- Patient card -->
+  <div class="patient-card">
+    <div class="avatar">{{ patientInitials }}</div>
+    <div class="patient-name">{{ patientName }}</div>
+    <div class="patient-record">{{ dataService.patient.recordNumber }}</div>
+    <div class="patient-meta">
+      <span><ion-icon name="call-outline"></ion-icon>{{ dataService.patient.phone }}</span>
+      <span><ion-icon name="mail-outline"></ion-icon>{{ dataService.patient.email }}</span>
+    </div>
+  </div>
+
+  <div class="profile-body">
+
+    <!-- Contact -->
+    <div class="contact-row">
+      <button class="contact-btn call" (click)="callClinic()">
+        <ion-icon name="call-outline"></ion-icon>
+        {{ langService.t('callClinic') }}
+      </button>
+      <button class="contact-btn wa" (click)="openWhatsApp()">
+        <ion-icon name="logo-whatsapp"></ion-icon>
+        {{ langService.t('whatsAppChat') }}
+      </button>
+    </div>
+
+    <!-- My Records -->
+    <div class="section-title">{{ langService.t('myRecords') }}</div>
+    <div class="menu-group">
+      <div class="menu-item">
+        <div class="menu-icon"><ion-icon name="calendar-outline"></ion-icon></div>
+        <div>
+          <div class="menu-label">{{ langService.t('appointments') }}</div>
+          <div class="menu-sublabel">{{ langService.t('manageVisits') }}</div>
+        </div>
+        <ion-icon [name]="langService.isRTL ? 'chevron-back' : 'chevron-forward'" class="chevron"></ion-icon>
+      </div>
+      <div class="menu-divider"></div>
+      <div class="menu-item">
+        <div class="menu-icon"><ion-icon name="card-outline"></ion-icon></div>
+        <div>
+          <div class="menu-label">{{ langService.t('billing') }}</div>
+          <div class="menu-sublabel">{{ langService.t('viewPayBills') }}</div>
+        </div>
+        <span class="badge badge-unpaid" *ngIf="unpaidInvoices > 0">{{ unpaidInvoices }}</span>
+        <ion-icon [name]="langService.isRTL ? 'chevron-back' : 'chevron-forward'" class="chevron"></ion-icon>
+      </div>
+      <div class="menu-divider"></div>
+      <div class="menu-item">
+        <div class="menu-icon"><ion-icon name="medical-outline"></ion-icon></div>
+        <div>
+          <div class="menu-label">{{ langService.isRTL ? 'الوصفات الطبية' : 'Prescriptions' }}</div>
+          <div class="menu-sublabel">{{ langService.t('doctorPrescriptions') }}</div>
+        </div>
+        <ion-icon [name]="langService.isRTL ? 'chevron-back' : 'chevron-forward'" class="chevron"></ion-icon>
+      </div>
+      <div class="menu-divider"></div>
+      <div class="menu-item">
+        <div class="menu-icon"><ion-icon name="document-text-outline"></ion-icon></div>
+        <div>
+          <div class="menu-label">{{ langService.t('questionnaires') }}</div>
+          <div class="menu-sublabel">{{ langService.t('formsSignatures') }}</div>
+        </div>
+        <span class="badge badge-upcoming" *ngIf="pendingForms > 0">{{ pendingForms }}</span>
+        <ion-icon [name]="langService.isRTL ? 'chevron-back' : 'chevron-forward'" class="chevron"></ion-icon>
+      </div>
+    </div>
+
+    <!-- Language -->
+    <div class="section-title">{{ langService.t('language') }}</div>
+    <div class="menu-group">
+      <div class="menu-item" (click)="toggleLanguage()">
+        <div class="menu-icon"><ion-icon name="language-outline"></ion-icon></div>
+        <div>
+          <div class="menu-label">{{ langService.t('language') }}</div>
+          <div class="menu-sublabel">{{ langService.language === 'en' ? 'English → العربية' : 'العربية → English' }}</div>
+        </div>
+        <span class="lang-badge">{{ langService.language.toUpperCase() }}</span>
+      </div>
+    </div>
+
+    <!-- Sign Out -->
+    <button class="sign-out-btn" (click)="signOut()">
+      <ion-icon name="log-out-outline"></ion-icon>
+      {{ langService.t('signOut') }}
+    </button>
+
+    <!-- Version -->
+    <div class="version-box">
+      <p>{{ langService.t('appVersion') }}</p>
+      <p>tamdental.sa</p>
+    </div>
+
+  </div>
+</ion-content>

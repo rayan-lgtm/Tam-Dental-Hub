@@ -1,0 +1,59 @@
+.health-content { padding: 12px 16px 100px; }
+
+.section-title {
+  font-size: 13px; font-weight: 700; color: #6f7374;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  margin: 16px 0 10px;
+}
+
+.rx-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+}
+
+.rx-icon {
+  font-size: 22px; color: #1691d0;
+  background: #eef6fb; border-radius: 10px;
+  padding: 8px; flex-shrink: 0;
+}
+
+.rx-id { font-size: 14px; font-weight: 700; color: #0d1b2a; }
+.rx-doctor { font-size: 12px; color: #6f7374; margin-top: 2px; }
+
+.rx-meds { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+
+.rx-med {
+  border-inline-start: 3px solid #1691d0;
+  padding-inline-start: 10px;
+}
+
+.med-name { font-size: 14px; font-weight: 600; color: #0d1b2a; display: block; }
+.med-detail { font-size: 12px; color: #6f7374; display: block; margin-top: 2px; }
+
+.rx-notes {
+  display: flex; align-items: flex-start; gap: 6px;
+  background: #eef6fb; border-radius: 8px; padding: 10px;
+  font-size: 12px; color: #6f7374;
+  ion-icon { color: #87b3d4; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+}
+
+.q-card { cursor: pointer; }
+
+.q-row { display: flex; align-items: center; gap: 12px; }
+
+.q-icon {
+  font-size: 22px; color: #1691d0;
+  background: #eef6fb; border-radius: 10px;
+  padding: 8px; flex-shrink: 0;
+}
+
+.q-info { flex: 1; }
+.q-title { font-size: 15px; font-weight: 600; color: #0d1b2a; }
+.q-due { font-size: 12px; color: #6f7374; margin-top: 2px; }
+
+.fill-btn {
+  margin-top: 12px; width: 100%;
+  background: #1691d0; color: #fff;
+  border: none; border-radius: 10px;
+  padding: 10px; font-size: 14px; font-weight: 600;
+  cursor: pointer;
+}

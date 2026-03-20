@@ -1,0 +1,30 @@
+<ion-tabs [attr.dir]="langService.dir">
+  <ion-tab-bar slot="bottom">
+
+    <ion-tab-button tab="home">
+      <ion-icon name="home-outline"></ion-icon>
+      <ion-label>{{ langService.t('tabHome') }}</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="appointments">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <ion-label>{{ langService.t('tabAppointments') }}</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="health">
+      <ion-icon name="heart-outline"></ion-icon>
+      <ion-label>{{ langService.t('tabHealth') }}</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="billing">
+      <ion-icon name="card-outline"></ion-icon>
+      <ion-label>{{ langService.t('tabBilling') }}</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="profile">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>{{ langService.t('tabProfile') }}</ion-label>
+    </ion-tab-button>
+
+  </ion-tab-bar>
+</ion-tabs>

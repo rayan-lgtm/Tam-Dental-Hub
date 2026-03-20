@@ -1,0 +1,58 @@
+<ion-header [attr.dir]="langService.dir">
+  <ion-toolbar>
+    <ion-title>{{ langService.t('health') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [attr.dir]="langService.dir">
+  <div class="health-content">
+
+    <!-- Prescriptions -->
+    <div class="section-title">{{ langService.isRTL ? 'الوصفات الطبية' : 'Prescriptions' }}</div>
+    <div class="tam-card" *ngFor="let rx of prescriptions">
+      <div class="rx-header">
+        <ion-icon name="medical-outline" class="rx-icon"></ion-icon>
+        <div>
+          <div class="rx-id">{{ rx.id }}</div>
+          <div class="rx-doctor">{{ rx.doctorName }} · {{ rx.date }}</div>
+        </div>
+        <span class="badge badge-completed">
+          {{ langService.isRTL ? 'موقّعة' : 'Signed' }}
+        </span>
+      </div>
+      <div class="rx-meds">
+        <div class="rx-med" *ngFor="let med of rx.medications">
+          <span class="med-name">{{ med.name }}</span>
+          <span class="med-detail">{{ med.dosage }} · {{ med.frequency }} · {{ med.duration }}</span>
+        </div>
+      </div>
+      <div class="rx-notes" *ngIf="rx.notes">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        <span>{{ rx.notes }}</span>
+      </div>
+    </div>
+
+    <!-- Questionnaires -->
+    <div class="section-title">{{ langService.t('questionnaires') }}</div>
+    <div class="tam-card q-card" *ngFor="let q of questionnaires">
+      <div class="q-row">
+        <ion-icon name="document-text-outline" class="q-icon"></ion-icon>
+        <div class="q-info">
+          <div class="q-title">{{ langService.language === 'ar' ? q.titleAr : q.title }}</div>
+          <div class="q-due" *ngIf="q.dueDate">
+            {{ langService.isRTL ? 'موعد التسليم: ' : 'Due: ' }}{{ q.dueDate }}
+          </div>
+        </div>
+        <span class="badge" [ngClass]="qStatusClass(q.status)">
+          {{ q.status === 'pending'
+            ? (langService.isRTL ? 'معلق' : 'Pending')
+            : (langService.isRTL ? 'مكتمل' : 'Done') }}
+        </span>
+      </div>
+      <button class="fill-btn" *ngIf="q.status === 'pending'">
+        {{ langService.isRTL ? 'تعبئة النموذج' : 'Fill Out Form' }}
+      </button>
+    </div>
+
+  </div>
+</ion-content>

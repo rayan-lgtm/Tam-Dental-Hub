@@ -1,0 +1,198 @@
+@import "~@ionic/angular/css/core.css";
+@import "~@ionic/angular/css/normalize.css";
+@import "~@ionic/angular/css/structure.css";
+@import "~@ionic/angular/css/typography.css";
+@import "~@ionic/angular/css/display.css";
+@import "~@ionic/angular/css/padding.css";
+@import "~@ionic/angular/css/float-elements.css";
+@import "~@ionic/angular/css/text-alignment.css";
+@import "~@ionic/angular/css/text-transformation.css";
+@import "~@ionic/angular/css/flex-utils.css";
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --font-family-en: -apple-system, 'Inter', 'Segoe UI', Roboto, sans-serif;
+  --font-family-ar: 'Tajawal', 'Cairo', 'IBM Plex Arabic', sans-serif;
+}
+
+html[lang="ar"],
+[dir="rtl"] {
+  font-family: var(--font-family-ar);
+}
+
+html[lang="en"],
+[dir="ltr"] {
+  font-family: var(--font-family-en);
+}
+
+ion-content {
+  --background: var(--tam-bg);
+}
+
+ion-toolbar {
+  --background: var(--tam-white);
+  --color: var(--tam-text);
+  --border-color: var(--tam-border);
+}
+
+ion-tab-bar {
+  --background: var(--tam-white);
+  border-top: 1px solid var(--tam-border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+ion-tab-button {
+  --color: var(--tam-text-muted);
+  --color-selected: var(--tam-primary);
+}
+
+// Shared card style
+.tam-card {
+  background: var(--tam-white);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(22, 145, 208, 0.08);
+  border: 1px solid var(--tam-border);
+}
+
+// Status badges
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  &.badge-upcoming  { background: #eef6fb; color: var(--tam-primary); }
+  &.badge-completed { background: #dcfce7; color: #16a34a; }
+  &.badge-cancelled { background: #fee2e2; color: #dc2626; }
+  &.badge-paid      { background: #dcfce7; color: #16a34a; }
+  &.badge-unpaid    { background: #fee2e2; color: #dc2626; }
+  &.badge-partial   { background: #fef3c7; color: #d97706; }
+}
+
+// Primary gradient header
+.header-gradient {
+  background: linear-gradient(160deg, #1c9fe0 0%, #1691d0 60%, #0d7bbf 100%);
+  padding: 20px 20px 52px;
+}
+
+// White card overlapping header
+.page-card {
+  background: var(--tam-white);
+  border-radius: 24px 24px 0 0;
+  margin-top: -28px;
+  min-height: 100%;
+  padding: 24px 20px;
+}
+
+// Section title
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tam-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 20px 0 10px;
+}
+
+// Menu group
+.menu-group {
+  background: var(--tam-white);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--tam-border);
+  margin-bottom: 16px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:active { background: var(--tam-bg-muted); }
+
+  .menu-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--tam-bg-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    ion-icon { font-size: 18px; color: var(--tam-primary); }
+  }
+
+  .menu-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--tam-text);
+    flex: 1;
+  }
+
+  .menu-sublabel {
+    font-size: 12px;
+    color: var(--tam-text-secondary);
+    margin-top: 2px;
+  }
+
+  .chevron { color: var(--tam-text-muted); font-size: 16px; }
+}
+
+.menu-divider {
+  height: 1px;
+  background: var(--tam-border);
+  margin-inline-start: 66px;
+}
+
+// Demo hint box
+.demo-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #eef6fb;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 8px;
+
+  ion-icon { color: var(--tam-secondary); font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  span { font-size: 12px; color: var(--tam-gray); line-height: 1.6; }
+}
+
+// Primary button
+.primary-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--tam-primary);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(22, 145, 208, 0.35);
+  transition: all 0.2s;
+  margin-bottom: 12px;
+
+  &:disabled {
+    background: var(--tam-secondary);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  ion-icon { font-size: 18px; }
+}

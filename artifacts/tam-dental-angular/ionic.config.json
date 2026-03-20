@@ -1,0 +1,7 @@
+{
+  "name": "TAM Dental",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

@@ -1,0 +1,60 @@
+<ion-header [attr.dir]="langService.dir">
+  <ion-toolbar>
+    <ion-title>{{ langService.t('appointments') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [attr.dir]="langService.dir">
+
+  <!-- Segment tabs -->
+  <div class="segment-wrap">
+    <div class="segment">
+      <button class="seg-btn" [class.active]="activeTab === 'upcoming'" (click)="activeTab = 'upcoming'">
+        {{ langService.t('upcoming') }}
+        <span class="seg-badge" *ngIf="upcoming.length > 0">{{ upcoming.length }}</span>
+      </button>
+      <button class="seg-btn" [class.active]="activeTab === 'past'" (click)="activeTab = 'past'">
+        {{ langService.t('past') }}
+      </button>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="apt-list" *ngIf="displayedAppointments.length > 0; else emptyState">
+    <div class="apt-card tam-card" *ngFor="let apt of displayedAppointments">
+      <div class="apt-top">
+        <div class="apt-avatar">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+        <div class="apt-info">
+          <div class="apt-doctor">{{ apt.doctorName }}</div>
+          <div class="apt-spec">{{ apt.doctorSpecialty }}</div>
+        </div>
+        <span class="badge" [ngClass]="statusClass(apt.status)">
+          {{ statusLabel(apt.status) }}
+        </span>
+      </div>
+      <div class="apt-meta">
+        <span><ion-icon name="calendar-outline"></ion-icon>{{ apt.date }}</span>
+        <span><ion-icon name="time-outline"></ion-icon>{{ apt.time }}</span>
+      </div>
+      <div class="apt-loc">
+        <ion-icon name="location-outline"></ion-icon>
+        <span>{{ apt.location }}</span>
+      </div>
+      <div class="apt-actions" *ngIf="apt.status === 'upcoming'">
+        <button class="cancel-btn" (click)="cancelAppointment(apt)">
+          {{ langService.t('cancelAppointment') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <p>{{ activeTab === 'upcoming' ? langService.t('noUpcomingApts') : langService.t('noPastApts') }}</p>
+    </div>
+  </ng-template>
+
+</ion-content>

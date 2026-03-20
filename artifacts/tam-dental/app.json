@@ -3,25 +3,53 @@
     "name": "TAM Dental",
     "slug": "tam-dental",
     "version": "1.0.0",
+    "runtimeVersion": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "tam-dental",
+    "scheme": "tamdental",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0A5F7A"
+      "backgroundColor": "#1691D0"
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "sa.tamdental.patient"
+      "bundleIdentifier": "sa.tamdental.patient",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "TAM Dental needs location access to enable GPS clinic check-in when you arrive.",
+        "NSCameraUsageDescription": "TAM Dental uses the camera to upload insurance cards and documents.",
+        "NSPhotoLibraryUsageDescription": "TAM Dental accesses your photo library to upload documents.",
+        "NSPhotoLibraryAddUsageDescription": "TAM Dental saves prescriptions and documents to your library.",
+        "NSFaceIDUsageDescription": "TAM Dental uses Face ID for quick secure login.",
+        "CFBundleLocalizations": ["en", "ar"],
+        "CFBundleDevelopmentRegion": "en"
+      }
     },
     "android": {
-      "package": "sa.tamdental.patient"
+      "package": "sa.tamdental.patient",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#1691D0"
+      },
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.VIBRATE",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.CALL_PHONE",
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "allowBackup": false
     },
     "web": {
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/icon.png",
+      "bundler": "metro"
     },
     "plugins": [
       [
@@ -42,6 +70,16 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/REPLACE_WITH_EAS_PROJECT_ID",
+      "enabled": true,
+      "fallbackToCacheTimeout": 0
     }
   }
 }

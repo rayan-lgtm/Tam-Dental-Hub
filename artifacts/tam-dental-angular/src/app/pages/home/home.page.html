@@ -1,0 +1,127 @@
+<ion-content [attr.dir]="langService.dir" class="home-content">
+
+  <!-- Header -->
+  <div class="header-gradient">
+    <div class="header-row">
+      <img src="assets/images/icon.png" class="header-logo" alt="TAM Dental" />
+      <div>
+        <div class="header-greeting">{{ greeting }}</div>
+        <div class="header-name">{{ patientDisplayName }}</div>
+      </div>
+    </div>
+    <div class="record-chip">
+      <ion-icon name="card-outline"></ion-icon>
+      <span>{{ dataService.patient.recordNumber }}</span>
+    </div>
+  </div>
+
+  <div class="page-card">
+
+    <!-- Alerts -->
+    <div class="alert-card alert-pending" *ngIf="pendingForms.length > 0" (click)="navigate('/tabs/health')">
+      <ion-icon name="document-text-outline"></ion-icon>
+      <span>
+        {{ langService.isRTL
+          ? 'لديك ' + pendingForms.length + ' نماذج معلقة'
+          : 'You have ' + pendingForms.length + ' pending form' + (pendingForms.length > 1 ? 's' : '') + ' to complete' }}
+      </span>
+      <ion-icon [name]="langService.isRTL ? 'chevron-back' : 'chevron-forward'" class="chevron"></ion-icon>
+    </div>
+
+    <div class="alert-card alert-unpaid" *ngIf="unpaidInvoices.length > 0" (click)="navigate('/tabs/billing')">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <span>
+        {{ langService.isRTL
+          ? unpaidInvoices.length + ' فاتورة غير مدفوعة'
+          : unpaidInvoices.length + ' unpaid invoice' + (unpaidInvoices.length > 1 ? 's' : '') + ' pending' }}
+      </span>
+      <ion-icon [name]="langService.isRTL ? 'chevron-back' : 'chevron-forward'" class="chevron"></ion-icon>
+    </div>
+
+    <!-- Next Appointment -->
+    <div class="section-title">{{ langService.t('nextAppointment') }}</div>
+    <div class="apt-card" *ngIf="nextAppointment; else noApt" (click)="navigate('/tabs/appointments')">
+      <div class="apt-doctor-row">
+        <div class="apt-avatar">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+        <div class="apt-info">
+          <div class="apt-doctor">{{ nextAppointment.doctorName }}</div>
+          <div class="apt-specialty">{{ nextAppointment.doctorSpecialty }}</div>
+        </div>
+        <span class="badge badge-upcoming">
+          {{ langService.t('aptStatus_upcoming') }}
+        </span>
+      </div>
+      <div class="apt-meta">
+        <div class="apt-meta-item">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <span>{{ nextAppointment.date }}</span>
+        </div>
+        <div class="apt-meta-item">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>{{ nextAppointment.time }}</span>
+        </div>
+        <div class="apt-meta-item">
+          <ion-icon name="location-outline"></ion-icon>
+          <span>{{ nextAppointment.location }}</span>
+        </div>
+      </div>
+    </div>
+    <ng-template #noApt>
+      <div class="empty-card" (click)="navigate('/tabs/appointments')">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>{{ langService.t('noUpcomingApts') }}</span>
+        <button class="book-btn">{{ langService.t('bookAppointment') }}</button>
+      </div>
+    </ng-template>
+
+    <!-- Quick Actions -->
+    <div class="section-title">{{ langService.t('quickActions') }}</div>
+    <div class="actions-grid">
+      <div class="action-btn" (click)="navigate('/tabs/appointments')">
+        <div class="action-icon" style="background:#eef6fb">
+          <ion-icon name="calendar-outline" style="color:#1691d0"></ion-icon>
+        </div>
+        <span>{{ langService.t('book') }}</span>
+      </div>
+      <div class="action-btn" (click)="navigate('/tabs/billing')">
+        <div class="action-icon" style="background:#fef3c7">
+          <ion-icon name="card-outline" style="color:#d97706"></ion-icon>
+        </div>
+        <span>{{ langService.t('payBill') }}</span>
+      </div>
+      <div class="action-btn" (click)="callClinic()">
+        <div class="action-icon" style="background:#dcfce7">
+          <ion-icon name="call-outline" style="color:#16a34a"></ion-icon>
+        </div>
+        <span>{{ langService.t('callClinic') }}</span>
+      </div>
+      <div class="action-btn" (click)="openWhatsApp()">
+        <div class="action-icon" style="background:#d1fae5">
+          <ion-icon name="logo-whatsapp" style="color:#25d366"></ion-icon>
+        </div>
+        <span>{{ langService.t('whatsAppChat') }}</span>
+      </div>
+      <div class="action-btn" (click)="navigate('/tabs/health')">
+        <div class="action-icon" style="background:#dbeafe">
+          <ion-icon name="document-text-outline" style="color:#2563eb"></ion-icon>
+        </div>
+        <span>{{ langService.t('requestDoc') }}</span>
+      </div>
+    </div>
+
+    <!-- Contact buttons -->
+    <div class="contact-row">
+      <button class="contact-btn call-btn" (click)="callClinic()">
+        <ion-icon name="call-outline"></ion-icon>
+        {{ langService.t('callClinic') }}
+      </button>
+      <button class="contact-btn wa-btn" (click)="openWhatsApp()">
+        <ion-icon name="logo-whatsapp"></ion-icon>
+        {{ langService.t('whatsAppChat') }}
+      </button>
+    </div>
+
+  </div>
+</ion-content>

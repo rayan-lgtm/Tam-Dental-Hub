@@ -1,0 +1,91 @@
+// TAM Dental – Brand Color System
+// Main:      #1691D0 (blue), #FFFFFF (white)
+// Secondary: #87B3D4 (light blue), #6F7374 (gray)
+
+:root {
+  --ion-color-primary: #1691d0;
+  --ion-color-primary-rgb: 22, 145, 208;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #0d7bbf;
+  --ion-color-primary-tint: #87b3d4;
+
+  --ion-color-secondary: #87b3d4;
+  --ion-color-secondary-rgb: 135, 179, 212;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #6f9ab8;
+  --ion-color-secondary-tint: #9fc2de;
+
+  --ion-color-tertiary: #6f7374;
+  --ion-color-tertiary-rgb: 111, 115, 116;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #5c6061;
+  --ion-color-tertiary-tint: #7e8182;
+
+  --ion-color-success: #16a34a;
+  --ion-color-success-rgb: 22, 163, 74;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #0f7a36;
+  --ion-color-success-tint: #22c55e;
+
+  --ion-color-warning: #d97706;
+  --ion-color-warning-rgb: 217, 119, 6;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #b45309;
+  --ion-color-warning-tint: #f59e0b;
+
+  --ion-color-danger: #dc2626;
+  --ion-color-danger-rgb: 220, 38, 38;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #b91c1c;
+  --ion-color-danger-tint: #ef4444;
+
+  --ion-color-light: #f4f8fc;
+  --ion-color-light-rgb: 244, 248, 252;
+  --ion-color-light-contrast: #0d1b2a;
+  --ion-color-light-contrast-rgb: 13, 27, 42;
+  --ion-color-light-shade: #d0dde8;
+  --ion-color-light-tint: #f9fbfd;
+
+  --ion-color-medium: #87b3d4;
+  --ion-color-medium-rgb: 135, 179, 212;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #6f9ab8;
+  --ion-color-medium-tint: #9fc2de;
+
+  --ion-color-dark: #0d1b2a;
+  --ion-color-dark-rgb: 13, 27, 42;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #09121d;
+  --ion-color-dark-tint: #1a2d42;
+
+  --ion-background-color: #f4f8fc;
+  --ion-background-color-rgb: 244, 248, 252;
+  --ion-text-color: #0d1b2a;
+  --ion-text-color-rgb: 13, 27, 42;
+  --ion-border-color: #c8ddf0;
+  --ion-tab-bar-background: #ffffff;
+  --ion-tab-bar-color: #87b3d4;
+  --ion-tab-bar-color-selected: #1691d0;
+
+  --tam-primary: #1691d0;
+  --tam-primary-dark: #0d7bbf;
+  --tam-primary-light: #87b3d4;
+  --tam-secondary: #87b3d4;
+  --tam-gray: #6f7374;
+  --tam-white: #ffffff;
+  --tam-bg: #f4f8fc;
+  --tam-bg-card: #ffffff;
+  --tam-bg-muted: #eef6fb;
+  --tam-border: #c8ddf0;
+  --tam-text: #0d1b2a;
+  --tam-text-secondary: #6f7374;
+  --tam-text-muted: #87b3d4;
+}

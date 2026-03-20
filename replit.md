@@ -2,7 +2,7 @@
 
 ## Overview
 
-pnpm workspace monorepo using TypeScript. Contains a TAM Dental Patient mobile application built with Expo.
+pnpm workspace monorepo using TypeScript. Contains a TAM Dental Patient mobile application built with **Expo/React Native** and an **Angular/Ionic** version with Capacitor for native store publishing.
 
 ## Stack
 
@@ -15,7 +15,8 @@ pnpm workspace monorepo using TypeScript. Contains a TAM Dental Patient mobile a
 - **Validation**: Zod (`zod/v4`), `drizzle-zod`
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
-- **Mobile**: Expo SDK 54, Expo Router (file-based routing)
+- **Mobile (Expo)**: Expo SDK 54, Expo Router (file-based routing)
+- **Mobile (Angular)**: Angular 17 + Ionic 7 + Capacitor 5
 
 ## Structure
 
@@ -23,7 +24,8 @@ pnpm workspace monorepo using TypeScript. Contains a TAM Dental Patient mobile a
 artifacts-monorepo/
 ├── artifacts/              # Deployable applications
 │   ├── api-server/         # Express API server
-│   └── tam-dental/         # TAM Dental Patient Expo mobile app
+│   ├── tam-dental/         # TAM Dental Patient Expo mobile app (primary)
+│   └── tam-dental-angular/ # TAM Dental Angular/Ionic version (for stores)
 ├── lib/                    # Shared libraries
 │   ├── api-spec/           # OpenAPI spec + Orval codegen config
 │   ├── api-client-react/   # Generated React Query hooks
@@ -36,9 +38,17 @@ artifacts-monorepo/
 └── package.json
 ```
 
-## TAM Dental Patient App (`artifacts/tam-dental`)
+---
+
+## TAM Dental Patient App – Expo (`artifacts/tam-dental`)
 
 A full-featured dental patient mobile app for TAM Dental Clinic (tamdental.sa).
+
+### Brand Colors
+- Primary: `#1691D0` (brand blue)
+- Secondary: `#87B3D4` (light blue)
+- Gray: `#6F7374`
+- White: `#FFFFFF`
 
 ### Features
 1. **Check In** — GPS-based check-in when within 500m of clinic
@@ -50,32 +60,54 @@ A full-featured dental patient mobile app for TAM Dental Clinic (tamdental.sa).
 7. **Questionnaires & Consents** — Medical history, consent forms, surveys
 8. **Call Clinic** — Direct phone dialing
 9. **WhatsApp** — Direct WhatsApp chat link
-10. **Document Requests** — Radiograph, sick leave, reports (submits to backend)
+10. **Document Requests** — Radiograph, sick leave, reports
 
-### Color Palette
-- Primary: `#0A5F7A` (deep teal)
-- Accent: `#00C4B4` (bright teal)
-- Background: `#F5F8FA`
+### Store Publishing (Expo / EAS)
+- `eas.json` — EAS Build + Submit configuration
+- `app.json` — Bundle ID `sa.tamdental.patient`, permissions declared for iOS + Android
 
-### File Structure
+### Auth
+- Phone (Saudi +966) + OTP login
+- Demo: any phone starting with 5, OTP = `123456`
+
+---
+
+## TAM Dental Angular/Ionic App (`artifacts/tam-dental-angular`)
+
+Angular 17 + Ionic 7 + Capacitor 5 version. Full feature parity with Expo app.
+
+### Structure
 ```
-app/
-  _layout.tsx               # Root layout with providers
-  (tabs)/
-    _layout.tsx             # Tab layout (NativeTabs/Tabs with liquid glass)
-    index.tsx               # Home dashboard
-    appointments.tsx        # Appointments list
-    health.tsx              # Prescriptions & forms
-    billing.tsx             # Invoices & payments
-    profile.tsx             # Profile & quick actions
-  appointment/[id].tsx      # Appointment detail + check-in
-  book-appointment.tsx      # 3-step booking modal
-  invoice/[id].tsx          # Invoice detail + pay
-  prescription/[id].tsx     # Prescription viewer
-  questionnaire/[id].tsx    # Form/questionnaire
-  request.tsx               # Document request submission
-context/
-  AppContext.tsx             # Global app state (mock data)
-constants/
-  colors.ts                 # Design system colors
+src/app/
+  pages/
+    login/          # Phone + OTP auth
+    tabs/           # Bottom tab container
+    home/           # Dashboard with GPS check-in, alerts, quick actions
+    appointments/   # Appointment list + cancel
+    health/         # Prescriptions + questionnaires
+    billing/        # Invoices + pay
+    profile/        # Patient info, family, language, sign out
+  services/
+    auth.service.ts       # Login/logout, Capacitor Preferences
+    language.service.ts   # EN/AR with RTL, all translations inline
+    app-data.service.ts   # Patient data, appointments, invoices, prescriptions
+  guards/auth.guard.ts    # Route protection
+  models/index.ts         # TypeScript interfaces
+theme/variables.scss      # Ionic + brand CSS custom properties
+global.scss               # Shared component styles
 ```
+
+### Store Publishing Files (`artifacts/tam-dental-angular/store/`)
+```
+store/
+  android/
+    build.gradle              # Gradle config (copy to android/app/)
+    AndroidManifest.xml       # Permissions + activities (copy to android/app/src/main/)
+    google-play-store-metadata.md  # Listing copy + submission checklist
+  ios/
+    Info.plist                # Permission strings + capabilities (copy to ios/App/App/)
+    app-store-metadata.md     # Listing copy + Xcode/review notes
+  PUBLISHING-GUIDE.md         # Step-by-step build & submission guide
+```
+
+App ID: `sa.tamdental.patient` (same for both platforms and both app versions)

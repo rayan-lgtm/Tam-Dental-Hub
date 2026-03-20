@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  TAM Dental – iOS Info.plist
+  File: ios/App/App/Info.plist
+  Bundle ID: sa.tamdental.patient
+-->
+<plist version="1.0">
+<dict>
+
+    <!-- ── App Identity ───────────────────────────────────────────── -->
+    <key>CFBundleDisplayName</key>
+    <string>TAM Dental</string>
+
+    <key>CFBundleName</key>
+    <string>TAMDental</string>
+
+    <key>CFBundleIdentifier</key>
+    <string>sa.tamdental.patient</string>
+
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+
+    <!-- Supported localizations: English + Arabic -->
+    <key>CFBundleLocalizations</key>
+    <array>
+        <string>en</string>
+        <string>ar</string>
+    </array>
+
+    <!-- ── UI Configuration ───────────────────────────────────────── -->
+    <key>UIRequiresFullScreen</key>
+    <true/>
+
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+    </array>
+
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+
+    <!-- Status bar style -->
+    <key>UIStatusBarStyle</key>
+    <string>UIStatusBarStyleLightContent</string>
+
+    <key>UIViewControllerBasedStatusBarAppearance</key>
+    <false/>
+
+    <!-- Launch screen storyboard -->
+    <key>UILaunchStoryboardName</key>
+    <string>LaunchScreen</string>
+
+    <!-- Main storyboard -->
+    <key>UIMainStoryboardFile</key>
+    <string>Main</string>
+
+    <!-- ── Permissions – Usage Descriptions ──────────────────────── -->
+
+    <!-- GPS Check-in feature -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>TAM Dental uses your location to allow GPS check-in when you arrive at the clinic.</string>
+
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>TAM Dental uses your location to allow GPS check-in when you arrive at the clinic.</string>
+
+    <!-- Camera for document uploads -->
+    <key>NSCameraUsageDescription</key>
+    <string>TAM Dental uses the camera to let you upload insurance cards and documents.</string>
+
+    <!-- Photo library for document uploads -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>TAM Dental accesses your photo library so you can upload documents and images.</string>
+
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>TAM Dental saves documents and prescriptions to your photo library.</string>
+
+    <!-- Microphone (if voice features added later) -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>TAM Dental may use the microphone for voice-based features.</string>
+
+    <!-- ── App Transport Security ─────────────────────────────────── -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+        <key>NSAllowsArbitraryLoadsInWebContent</key>
+        <true/>
+    </dict>
+
+    <!-- ── Background Modes ───────────────────────────────────────── -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>remote-notification</string>
+    </array>
+
+    <!-- ── URL Schemes (Deep Linking) ────────────────────────────── -->
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>sa.tamdental.patient</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>tamdental</string>
+            </array>
+        </dict>
+    </array>
+
+    <!-- ── Capacitor Config ───────────────────────────────────────── -->
+    <key>WKAppBoundDomains</key>
+    <array>
+        <string>tamdental.sa</string>
+        <string>localhost</string>
+    </array>
+
+    <!-- ── Face ID / Touch ID (for future biometric login) ───────── -->
+    <key>NSFaceIDUsageDescription</key>
+    <string>TAM Dental uses Face ID for quick and secure login.</string>
+
+</dict>
+</plist>

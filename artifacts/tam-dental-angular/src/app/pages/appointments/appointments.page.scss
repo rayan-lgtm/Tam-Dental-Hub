@@ -1,0 +1,121 @@
+.segment-wrap {
+  background: #fff;
+  padding: 12px 16px;
+  border-bottom: 1px solid #c8ddf0;
+}
+
+.segment {
+  display: flex;
+  background: #f4f8fc;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.seg-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6f7374;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &.active {
+    background: #fff;
+    color: #1691d0;
+    font-weight: 700;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+}
+
+.seg-badge {
+  background: #1691d0;
+  color: #fff;
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.apt-list {
+  padding: 12px 16px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.apt-card {
+  cursor: pointer;
+}
+
+.apt-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.apt-avatar {
+  width: 44px; height: 44px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #1691d0, #87b3d4);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  ion-icon { color: #fff; font-size: 20px; }
+}
+
+.apt-info { flex: 1; }
+.apt-doctor { font-size: 16px; font-weight: 700; color: #0d1b2a; }
+.apt-spec { font-size: 12px; color: #6f7374; margin-top: 2px; }
+
+.apt-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+  span {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 13px; color: #6f7374;
+    ion-icon { color: #1691d0; font-size: 14px; }
+  }
+}
+
+.apt-loc {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 13px; color: #6f7374;
+  ion-icon { color: #1691d0; font-size: 14px; }
+}
+
+.apt-actions {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0edf7;
+}
+
+.cancel-btn {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  gap: 12px;
+  ion-icon { font-size: 48px; color: #87b3d4; }
+  p { font-size: 15px; color: #6f7374; text-align: center; }
+}
