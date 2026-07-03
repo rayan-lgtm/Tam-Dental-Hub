@@ -14,3 +14,232 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * @summary Get top-level dashboard KPI summary for a date range
+ */
+export const GetDashboardSummaryQueryParams = zod.object({
+  from: zod.coerce
+    .string()
+    .date()
+    .describe("Start date (inclusive), YYYY-MM-DD"),
+  to: zod.coerce.string().date().describe("End date (inclusive), YYYY-MM-DD"),
+});
+
+export const GetDashboardSummaryResponse = zod.object({
+  netRevenue: zod.number(),
+  grossMargin: zod.number(),
+  marketingSpend: zod.number(),
+  netMarginAfterMarketing: zod.number(),
+  discountAmount: zod.number(),
+  grossRevenue: zod.number(),
+  orderCount: zod.number(),
+  arOutstanding: zod.number(),
+  grossMarginPercent: zod.number(),
+  netMarginPercent: zod.number(),
+  discountPercent: zod.number(),
+  activeRetailerCount: zod.number(),
+  averageOrderValue: zod.number(),
+  topRetailersByRevenue: zod.array(
+    zod.object({
+      retailerId: zod.number(),
+      name: zod.string(),
+      category: zod.string().nullable(),
+      status: zod.string(),
+      orderCount: zod.number(),
+      grossRevenue: zod.number(),
+      discountAmount: zod.number(),
+      discountPercent: zod.number(),
+      netRevenue: zod.number(),
+      cogs: zod.number(),
+      grossMargin: zod.number(),
+      grossMarginPercent: zod.number(),
+      marketingSpend: zod.number(),
+      netMarginAfterMarketing: zod.number(),
+      netMarginPercent: zod.number(),
+      averageOrderValue: zod.number(),
+      arOutstanding: zod.number(),
+      lastOrderDate: zod.string().nullable(),
+      revenuePriorPeriod: zod.number(),
+      revenueGrowthPercent: zod.number().nullable(),
+      abcClass: zod.enum(["A", "B", "C"]),
+    }),
+  ),
+  lowestMarginRetailers: zod.array(
+    zod.object({
+      retailerId: zod.number(),
+      name: zod.string(),
+      category: zod.string().nullable(),
+      status: zod.string(),
+      orderCount: zod.number(),
+      grossRevenue: zod.number(),
+      discountAmount: zod.number(),
+      discountPercent: zod.number(),
+      netRevenue: zod.number(),
+      cogs: zod.number(),
+      grossMargin: zod.number(),
+      grossMarginPercent: zod.number(),
+      marketingSpend: zod.number(),
+      netMarginAfterMarketing: zod.number(),
+      netMarginPercent: zod.number(),
+      averageOrderValue: zod.number(),
+      arOutstanding: zod.number(),
+      lastOrderDate: zod.string().nullable(),
+      revenuePriorPeriod: zod.number(),
+      revenueGrowthPercent: zod.number().nullable(),
+      abcClass: zod.enum(["A", "B", "C"]),
+    }),
+  ),
+});
+
+/**
+ * @summary Get per-retailer KPIs (revenue, margin, discounts, marketing, growth) for a date range
+ */
+export const GetRetailerKpisQueryParams = zod.object({
+  from: zod.coerce
+    .string()
+    .date()
+    .describe("Start date (inclusive), YYYY-MM-DD"),
+  to: zod.coerce.string().date().describe("End date (inclusive), YYYY-MM-DD"),
+});
+
+export const GetRetailerKpisResponseItem = zod.object({
+  retailerId: zod.number(),
+  name: zod.string(),
+  category: zod.string().nullable(),
+  status: zod.string(),
+  orderCount: zod.number(),
+  grossRevenue: zod.number(),
+  discountAmount: zod.number(),
+  discountPercent: zod.number(),
+  netRevenue: zod.number(),
+  cogs: zod.number(),
+  grossMargin: zod.number(),
+  grossMarginPercent: zod.number(),
+  marketingSpend: zod.number(),
+  netMarginAfterMarketing: zod.number(),
+  netMarginPercent: zod.number(),
+  averageOrderValue: zod.number(),
+  arOutstanding: zod.number(),
+  lastOrderDate: zod.string().nullable(),
+  revenuePriorPeriod: zod.number(),
+  revenueGrowthPercent: zod.number().nullable(),
+  abcClass: zod.enum(["A", "B", "C"]),
+});
+export const GetRetailerKpisResponse = zod.array(GetRetailerKpisResponseItem);
+
+/**
+ * @summary Get per-product margin after discounts for a date range
+ */
+export const GetProductMarginsQueryParams = zod.object({
+  from: zod.coerce
+    .string()
+    .date()
+    .describe("Start date (inclusive), YYYY-MM-DD"),
+  to: zod.coerce.string().date().describe("End date (inclusive), YYYY-MM-DD"),
+});
+
+export const GetProductMarginsResponseItem = zod.object({
+  productId: zod.number(),
+  sku: zod.string(),
+  name: zod.string(),
+  category: zod.string().nullable(),
+  unitsSold: zod.number(),
+  grossRevenue: zod.number(),
+  discountAmount: zod.number(),
+  netRevenue: zod.number(),
+  cogs: zod.number(),
+  grossMargin: zod.number(),
+  grossMarginPercent: zod.number(),
+  avgDiscountPercent: zod.number(),
+});
+export const GetProductMarginsResponse = zod.array(
+  GetProductMarginsResponseItem,
+);
+
+/**
+ * @summary List marketing spend entries in a date range
+ */
+export const ListMarketingSpendQueryParams = zod.object({
+  from: zod.coerce
+    .string()
+    .date()
+    .describe("Start date (inclusive), YYYY-MM-DD"),
+  to: zod.coerce.string().date().describe("End date (inclusive), YYYY-MM-DD"),
+});
+
+export const ListMarketingSpendResponseItem = zod.object({
+  id: zod.number(),
+  retailerId: zod.number().nullable(),
+  retailerName: zod.string().nullable(),
+  channel: zod.string(),
+  periodStart: zod.string().date(),
+  periodEnd: zod.string().date(),
+  amount: zod.number(),
+  source: zod.string(),
+  notes: zod.string().nullable(),
+});
+export const ListMarketingSpendResponse = zod.array(
+  ListMarketingSpendResponseItem,
+);
+
+/**
+ * @summary Create a manual marketing spend entry
+ */
+export const CreateMarketingSpendBody = zod.object({
+  retailerId: zod.number().nullish(),
+  channel: zod.string(),
+  periodStart: zod.string().date(),
+  periodEnd: zod.string().date(),
+  amount: zod.number(),
+  notes: zod.string().nullish(),
+});
+
+/**
+ * @summary Delete a marketing spend entry
+ */
+export const DeleteMarketingSpendParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary Bulk-import marketing spend from a CSV or XLSX file (e.g. exported from a Looker Studio / ad platform data source)
+ */
+export const ImportMarketingSpendBody = zod
+  .object({
+    filename: zod.string(),
+    contentBase64: zod.string(),
+  })
+  .describe(
+    "CSV\/XLSX file content, base64-encoded. Expected columns: retailer (retailer name, blank for unallocated brand spend), channel, period_start, period_end, amount, notes.\n",
+  );
+
+export const ImportMarketingSpendResponse = zod.object({
+  imported: zod.number(),
+  skipped: zod.number(),
+  errors: zod.array(zod.string()),
+});
+
+/**
+ * @summary Trigger a sync of products, retailers, and sale orders from Cin7 Core
+ */
+export const TriggerCin7SyncResponse = zod.object({
+  products: zod.number(),
+  retailers: zod.number(),
+  saleOrders: zod.number(),
+});
+
+/**
+ * @summary Get last-sync status per resource
+ */
+export const GetCin7SyncStatusResponseItem = zod.object({
+  resource: zod.string(),
+  lastSyncedAt: zod.string().datetime({}).nullable(),
+  lastCursor: zod.string().nullable(),
+  recordsSynced: zod.number(),
+  status: zod.string(),
+  lastError: zod.string().nullable(),
+});
+export const GetCin7SyncStatusResponse = zod.array(
+  GetCin7SyncStatusResponseItem,
+);

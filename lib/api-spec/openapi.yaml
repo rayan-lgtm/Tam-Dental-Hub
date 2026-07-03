@@ -10,6 +10,16 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: Retail dashboard summary KPIs
+  - name: retailers
+    description: Retailer-level KPIs
+  - name: products
+    description: Product margin analysis
+  - name: marketing-spend
+    description: Marketing / media buying spend tracking
+  - name: cin7
+    description: Cin7 Core (DEAR Systems) sync
 paths:
   /healthz:
     get:
@@ -24,7 +34,175 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get top-level dashboard KPI summary for a date range
+      parameters:
+        - $ref: "#/components/parameters/FromDate"
+        - $ref: "#/components/parameters/ToDate"
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /retailers/kpis:
+    get:
+      operationId: getRetailerKpis
+      tags: [retailers]
+      summary: Get per-retailer KPIs (revenue, margin, discounts, marketing, growth) for a date range
+      parameters:
+        - $ref: "#/components/parameters/FromDate"
+        - $ref: "#/components/parameters/ToDate"
+      responses:
+        "200":
+          description: Retailer KPIs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RetailerKpi"
+
+  /products/margins:
+    get:
+      operationId: getProductMargins
+      tags: [products]
+      summary: Get per-product margin after discounts for a date range
+      parameters:
+        - $ref: "#/components/parameters/FromDate"
+        - $ref: "#/components/parameters/ToDate"
+      responses:
+        "200":
+          description: Product margins
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductMargin"
+
+  /marketing-spend:
+    get:
+      operationId: listMarketingSpend
+      tags: [marketing-spend]
+      summary: List marketing spend entries in a date range
+      parameters:
+        - $ref: "#/components/parameters/FromDate"
+        - $ref: "#/components/parameters/ToDate"
+      responses:
+        "200":
+          description: Marketing spend entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MarketingSpendEntry"
+    post:
+      operationId: createMarketingSpend
+      tags: [marketing-spend]
+      summary: Create a manual marketing spend entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMarketingSpendInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketingSpendEntry"
+
+  /marketing-spend/{id}:
+    delete:
+      operationId: deleteMarketingSpend
+      tags: [marketing-spend]
+      summary: Delete a marketing spend entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /marketing-spend/import:
+    post:
+      operationId: importMarketingSpend
+      tags: [marketing-spend]
+      summary: Bulk-import marketing spend from a CSV or XLSX file (e.g. exported from a Looker Studio / ad platform data source)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportMarketingSpendInput"
+      responses:
+        "200":
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportMarketingSpendResult"
+
+  /cin7/sync:
+    post:
+      operationId: triggerCin7Sync
+      tags: [cin7]
+      summary: Trigger a sync of products, retailers, and sale orders from Cin7 Core
+      responses:
+        "200":
+          description: Sync result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cin7SyncResult"
+
+  /cin7/sync/status:
+    get:
+      operationId: getCin7SyncStatus
+      tags: [cin7]
+      summary: Get last-sync status per resource
+      responses:
+        "200":
+          description: Sync status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cin7SyncState"
+
 components:
+  parameters:
+    FromDate:
+      name: from
+      in: query
+      required: true
+      description: Start date (inclusive), YYYY-MM-DD
+      schema:
+        type: string
+        format: date
+    ToDate:
+      name: to
+      in: query
+      required: true
+      description: End date (inclusive), YYYY-MM-DD
+      schema:
+        type: string
+        format: date
+
   schemas:
     HealthStatus:
       type: object
@@ -34,3 +212,211 @@ components:
       required:
         - status
 
+    RetailerKpi:
+      type: object
+      properties:
+        retailerId: { type: integer }
+        name: { type: string }
+        category: { type: [string, "null"] }
+        status: { type: string }
+        orderCount: { type: integer }
+        grossRevenue: { type: number }
+        discountAmount: { type: number }
+        discountPercent: { type: number }
+        netRevenue: { type: number }
+        cogs: { type: number }
+        grossMargin: { type: number }
+        grossMarginPercent: { type: number }
+        marketingSpend: { type: number }
+        netMarginAfterMarketing: { type: number }
+        netMarginPercent: { type: number }
+        averageOrderValue: { type: number }
+        arOutstanding: { type: number }
+        lastOrderDate: { type: [string, "null"] }
+        revenuePriorPeriod: { type: number }
+        revenueGrowthPercent: { type: [number, "null"] }
+        abcClass: { type: string, enum: [A, B, C] }
+      required:
+        - retailerId
+        - name
+        - category
+        - status
+        - orderCount
+        - grossRevenue
+        - discountAmount
+        - discountPercent
+        - netRevenue
+        - cogs
+        - grossMargin
+        - grossMarginPercent
+        - marketingSpend
+        - netMarginAfterMarketing
+        - netMarginPercent
+        - averageOrderValue
+        - arOutstanding
+        - lastOrderDate
+        - revenuePriorPeriod
+        - revenueGrowthPercent
+        - abcClass
+
+    ProductMargin:
+      type: object
+      properties:
+        productId: { type: integer }
+        sku: { type: string }
+        name: { type: string }
+        category: { type: [string, "null"] }
+        unitsSold: { type: number }
+        grossRevenue: { type: number }
+        discountAmount: { type: number }
+        netRevenue: { type: number }
+        cogs: { type: number }
+        grossMargin: { type: number }
+        grossMarginPercent: { type: number }
+        avgDiscountPercent: { type: number }
+      required:
+        - productId
+        - sku
+        - name
+        - category
+        - unitsSold
+        - grossRevenue
+        - discountAmount
+        - netRevenue
+        - cogs
+        - grossMargin
+        - grossMarginPercent
+        - avgDiscountPercent
+
+    DashboardSummary:
+      type: object
+      properties:
+        netRevenue: { type: number }
+        grossMargin: { type: number }
+        marketingSpend: { type: number }
+        netMarginAfterMarketing: { type: number }
+        discountAmount: { type: number }
+        grossRevenue: { type: number }
+        orderCount: { type: integer }
+        arOutstanding: { type: number }
+        grossMarginPercent: { type: number }
+        netMarginPercent: { type: number }
+        discountPercent: { type: number }
+        activeRetailerCount: { type: integer }
+        averageOrderValue: { type: number }
+        topRetailersByRevenue:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetailerKpi"
+        lowestMarginRetailers:
+          type: array
+          items:
+            $ref: "#/components/schemas/RetailerKpi"
+      required:
+        - netRevenue
+        - grossMargin
+        - marketingSpend
+        - netMarginAfterMarketing
+        - discountAmount
+        - grossRevenue
+        - orderCount
+        - arOutstanding
+        - grossMarginPercent
+        - netMarginPercent
+        - discountPercent
+        - activeRetailerCount
+        - averageOrderValue
+        - topRetailersByRevenue
+        - lowestMarginRetailers
+
+    MarketingSpendEntry:
+      type: object
+      properties:
+        id: { type: integer }
+        retailerId: { type: [integer, "null"] }
+        retailerName: { type: [string, "null"] }
+        channel: { type: string }
+        periodStart: { type: string, format: date }
+        periodEnd: { type: string, format: date }
+        amount: { type: number }
+        source: { type: string }
+        notes: { type: [string, "null"] }
+      required:
+        - id
+        - retailerId
+        - retailerName
+        - channel
+        - periodStart
+        - periodEnd
+        - amount
+        - source
+        - notes
+
+    CreateMarketingSpendInput:
+      type: object
+      properties:
+        retailerId: { type: [integer, "null"] }
+        channel: { type: string }
+        periodStart: { type: string, format: date }
+        periodEnd: { type: string, format: date }
+        amount: { type: number }
+        notes: { type: [string, "null"] }
+      required:
+        - channel
+        - periodStart
+        - periodEnd
+        - amount
+
+    ImportMarketingSpendInput:
+      type: object
+      description: >
+        CSV/XLSX file content, base64-encoded. Expected columns: retailer
+        (retailer name, blank for unallocated brand spend), channel,
+        period_start, period_end, amount, notes.
+      properties:
+        filename: { type: string }
+        contentBase64: { type: string }
+      required:
+        - filename
+        - contentBase64
+
+    ImportMarketingSpendResult:
+      type: object
+      properties:
+        imported: { type: integer }
+        skipped: { type: integer }
+        errors:
+          type: array
+          items: { type: string }
+      required:
+        - imported
+        - skipped
+        - errors
+
+    Cin7SyncResult:
+      type: object
+      properties:
+        products: { type: integer }
+        retailers: { type: integer }
+        saleOrders: { type: integer }
+      required:
+        - products
+        - retailers
+        - saleOrders
+
+    Cin7SyncState:
+      type: object
+      properties:
+        resource: { type: string }
+        lastSyncedAt: { type: [string, "null"], format: date-time }
+        lastCursor: { type: [string, "null"] }
+        recordsSynced: { type: integer }
+        status: { type: string }
+        lastError: { type: [string, "null"] }
+      required:
+        - resource
+        - lastSyncedAt
+        - lastCursor
+        - recordsSynced
+        - status
+        - lastError

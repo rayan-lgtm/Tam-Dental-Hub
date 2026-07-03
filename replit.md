@@ -2,7 +2,7 @@
 
 ## Overview
 
-pnpm workspace monorepo using TypeScript. Contains a TAM Dental Patient mobile application built with **Expo/React Native** and an **Angular/Ionic** version with Capacitor for native store publishing.
+pnpm workspace monorepo using TypeScript. Contains a TAM Dental Patient mobile application built with **Expo/React Native** and an **Angular/Ionic** version with Capacitor for native store publishing, plus a separate **Retail Margins & Retailer KPIs** dashboard (`artifacts/retail-dashboard`) for a different business unit — see its own README for details.
 
 ## Stack
 
@@ -25,7 +25,8 @@ artifacts-monorepo/
 ├── artifacts/              # Deployable applications
 │   ├── api-server/         # Express API server
 │   ├── tam-dental/         # TAM Dental Patient Expo mobile app (primary)
-│   └── tam-dental-angular/ # TAM Dental Angular/Ionic version (for stores)
+│   ├── tam-dental-angular/ # TAM Dental Angular/Ionic version (for stores)
+│   └── retail-dashboard/   # Cin7 + Looker Studio retail margins/KPIs dashboard (separate business unit, see its README)
 ├── lib/                    # Shared libraries
 │   ├── api-spec/           # OpenAPI spec + Orval codegen config
 │   ├── api-client-react/   # Generated React Query hooks

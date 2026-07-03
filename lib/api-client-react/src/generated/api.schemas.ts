@@ -8,3 +8,186 @@
 export interface HealthStatus {
   status: string;
 }
+
+export type RetailerKpiAbcClass =
+  (typeof RetailerKpiAbcClass)[keyof typeof RetailerKpiAbcClass];
+
+export const RetailerKpiAbcClass = {
+  A: "A",
+  B: "B",
+  C: "C",
+} as const;
+
+export interface RetailerKpi {
+  retailerId: number;
+  name: string;
+  /** @nullable */
+  category: string | null;
+  status: string;
+  orderCount: number;
+  grossRevenue: number;
+  discountAmount: number;
+  discountPercent: number;
+  netRevenue: number;
+  cogs: number;
+  grossMargin: number;
+  grossMarginPercent: number;
+  marketingSpend: number;
+  netMarginAfterMarketing: number;
+  netMarginPercent: number;
+  averageOrderValue: number;
+  arOutstanding: number;
+  /** @nullable */
+  lastOrderDate: string | null;
+  revenuePriorPeriod: number;
+  /** @nullable */
+  revenueGrowthPercent: number | null;
+  abcClass: RetailerKpiAbcClass;
+}
+
+export interface ProductMargin {
+  productId: number;
+  sku: string;
+  name: string;
+  /** @nullable */
+  category: string | null;
+  unitsSold: number;
+  grossRevenue: number;
+  discountAmount: number;
+  netRevenue: number;
+  cogs: number;
+  grossMargin: number;
+  grossMarginPercent: number;
+  avgDiscountPercent: number;
+}
+
+export interface DashboardSummary {
+  netRevenue: number;
+  grossMargin: number;
+  marketingSpend: number;
+  netMarginAfterMarketing: number;
+  discountAmount: number;
+  grossRevenue: number;
+  orderCount: number;
+  arOutstanding: number;
+  grossMarginPercent: number;
+  netMarginPercent: number;
+  discountPercent: number;
+  activeRetailerCount: number;
+  averageOrderValue: number;
+  topRetailersByRevenue: RetailerKpi[];
+  lowestMarginRetailers: RetailerKpi[];
+}
+
+export interface MarketingSpendEntry {
+  id: number;
+  /** @nullable */
+  retailerId: number | null;
+  /** @nullable */
+  retailerName: string | null;
+  channel: string;
+  periodStart: string;
+  periodEnd: string;
+  amount: number;
+  source: string;
+  /** @nullable */
+  notes: string | null;
+}
+
+export interface CreateMarketingSpendInput {
+  /** @nullable */
+  retailerId?: number | null;
+  channel: string;
+  periodStart: string;
+  periodEnd: string;
+  amount: number;
+  /** @nullable */
+  notes?: string | null;
+}
+
+/**
+ * CSV/XLSX file content, base64-encoded. Expected columns: retailer (retailer name, blank for unallocated brand spend), channel, period_start, period_end, amount, notes.
+
+ */
+export interface ImportMarketingSpendInput {
+  filename: string;
+  contentBase64: string;
+}
+
+export interface ImportMarketingSpendResult {
+  imported: number;
+  skipped: number;
+  errors: string[];
+}
+
+export interface Cin7SyncResult {
+  products: number;
+  retailers: number;
+  saleOrders: number;
+}
+
+export interface Cin7SyncState {
+  resource: string;
+  /** @nullable */
+  lastSyncedAt: string | null;
+  /** @nullable */
+  lastCursor: string | null;
+  recordsSynced: number;
+  status: string;
+  /** @nullable */
+  lastError: string | null;
+}
+
+/**
+ * Start date (inclusive), YYYY-MM-DD
+ */
+export type FromDateParameter = string;
+
+/**
+ * End date (inclusive), YYYY-MM-DD
+ */
+export type ToDateParameter = string;
+
+export type GetDashboardSummaryParams = {
+  /**
+   * Start date (inclusive), YYYY-MM-DD
+   */
+  from: FromDateParameter;
+  /**
+   * End date (inclusive), YYYY-MM-DD
+   */
+  to: ToDateParameter;
+};
+
+export type GetRetailerKpisParams = {
+  /**
+   * Start date (inclusive), YYYY-MM-DD
+   */
+  from: FromDateParameter;
+  /**
+   * End date (inclusive), YYYY-MM-DD
+   */
+  to: ToDateParameter;
+};
+
+export type GetProductMarginsParams = {
+  /**
+   * Start date (inclusive), YYYY-MM-DD
+   */
+  from: FromDateParameter;
+  /**
+   * End date (inclusive), YYYY-MM-DD
+   */
+  to: ToDateParameter;
+};
+
+export type ListMarketingSpendParams = {
+  /**
+   * Start date (inclusive), YYYY-MM-DD
+   */
+  from: FromDateParameter;
+  /**
+   * End date (inclusive), YYYY-MM-DD
+   */
+  to: ToDateParameter;
+};

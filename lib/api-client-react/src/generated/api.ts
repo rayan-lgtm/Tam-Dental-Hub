@@ -5,18 +5,36 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  Cin7SyncResult,
+  Cin7SyncState,
+  CreateMarketingSpendInput,
+  DashboardSummary,
+  GetDashboardSummaryParams,
+  GetProductMarginsParams,
+  GetRetailerKpisParams,
+  HealthStatus,
+  ImportMarketingSpendInput,
+  ImportMarketingSpendResult,
+  ListMarketingSpendParams,
+  MarketingSpendEntry,
+  ProductMargin,
+  RetailerKpi,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -92,6 +110,808 @@ export function useHealthCheck<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getHealthCheckQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get top-level dashboard KPI summary for a date range
+ */
+export const getGetDashboardSummaryUrl = (
+  params: GetDashboardSummaryParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/dashboard/summary?${stringifiedParams}`
+    : `/api/dashboard/summary`;
+};
+
+export const getDashboardSummary = async (
+  params: GetDashboardSummaryParams,
+  options?: RequestInit,
+): Promise<DashboardSummary> => {
+  return customFetch<DashboardSummary>(getGetDashboardSummaryUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetDashboardSummaryQueryKey = (
+  params?: GetDashboardSummaryParams,
+) => {
+  return [`/api/dashboard/summary`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetDashboardSummaryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getDashboardSummary>>,
+  TError = ErrorType<unknown>,
+>(
+  params: GetDashboardSummaryParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getDashboardSummary>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetDashboardSummaryQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getDashboardSummary>>
+  > = ({ signal }) =>
+    getDashboardSummary(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getDashboardSummary>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetDashboardSummaryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getDashboardSummary>>
+>;
+export type GetDashboardSummaryQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get top-level dashboard KPI summary for a date range
+ */
+
+export function useGetDashboardSummary<
+  TData = Awaited<ReturnType<typeof getDashboardSummary>>,
+  TError = ErrorType<unknown>,
+>(
+  params: GetDashboardSummaryParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getDashboardSummary>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetDashboardSummaryQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get per-retailer KPIs (revenue, margin, discounts, marketing, growth) for a date range
+ */
+export const getGetRetailerKpisUrl = (params: GetRetailerKpisParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/retailers/kpis?${stringifiedParams}`
+    : `/api/retailers/kpis`;
+};
+
+export const getRetailerKpis = async (
+  params: GetRetailerKpisParams,
+  options?: RequestInit,
+): Promise<RetailerKpi[]> => {
+  return customFetch<RetailerKpi[]>(getGetRetailerKpisUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetRetailerKpisQueryKey = (params?: GetRetailerKpisParams) => {
+  return [`/api/retailers/kpis`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetRetailerKpisQueryOptions = <
+  TData = Awaited<ReturnType<typeof getRetailerKpis>>,
+  TError = ErrorType<unknown>,
+>(
+  params: GetRetailerKpisParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getRetailerKpis>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetRetailerKpisQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getRetailerKpis>>> = ({
+    signal,
+  }) => getRetailerKpis(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getRetailerKpis>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetRetailerKpisQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getRetailerKpis>>
+>;
+export type GetRetailerKpisQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get per-retailer KPIs (revenue, margin, discounts, marketing, growth) for a date range
+ */
+
+export function useGetRetailerKpis<
+  TData = Awaited<ReturnType<typeof getRetailerKpis>>,
+  TError = ErrorType<unknown>,
+>(
+  params: GetRetailerKpisParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getRetailerKpis>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetRetailerKpisQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get per-product margin after discounts for a date range
+ */
+export const getGetProductMarginsUrl = (params: GetProductMarginsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/products/margins?${stringifiedParams}`
+    : `/api/products/margins`;
+};
+
+export const getProductMargins = async (
+  params: GetProductMarginsParams,
+  options?: RequestInit,
+): Promise<ProductMargin[]> => {
+  return customFetch<ProductMargin[]>(getGetProductMarginsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetProductMarginsQueryKey = (
+  params?: GetProductMarginsParams,
+) => {
+  return [`/api/products/margins`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetProductMarginsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getProductMargins>>,
+  TError = ErrorType<unknown>,
+>(
+  params: GetProductMarginsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getProductMargins>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetProductMarginsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getProductMargins>>
+  > = ({ signal }) => getProductMargins(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getProductMargins>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetProductMarginsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getProductMargins>>
+>;
+export type GetProductMarginsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get per-product margin after discounts for a date range
+ */
+
+export function useGetProductMargins<
+  TData = Awaited<ReturnType<typeof getProductMargins>>,
+  TError = ErrorType<unknown>,
+>(
+  params: GetProductMarginsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getProductMargins>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetProductMarginsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary List marketing spend entries in a date range
+ */
+export const getListMarketingSpendUrl = (params: ListMarketingSpendParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/marketing-spend?${stringifiedParams}`
+    : `/api/marketing-spend`;
+};
+
+export const listMarketingSpend = async (
+  params: ListMarketingSpendParams,
+  options?: RequestInit,
+): Promise<MarketingSpendEntry[]> => {
+  return customFetch<MarketingSpendEntry[]>(getListMarketingSpendUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListMarketingSpendQueryKey = (
+  params?: ListMarketingSpendParams,
+) => {
+  return [`/api/marketing-spend`, ...(params ? [params] : [])] as const;
+};
+
+export const getListMarketingSpendQueryOptions = <
+  TData = Awaited<ReturnType<typeof listMarketingSpend>>,
+  TError = ErrorType<unknown>,
+>(
+  params: ListMarketingSpendParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listMarketingSpend>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListMarketingSpendQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listMarketingSpend>>
+  > = ({ signal }) => listMarketingSpend(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listMarketingSpend>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListMarketingSpendQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listMarketingSpend>>
+>;
+export type ListMarketingSpendQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List marketing spend entries in a date range
+ */
+
+export function useListMarketingSpend<
+  TData = Awaited<ReturnType<typeof listMarketingSpend>>,
+  TError = ErrorType<unknown>,
+>(
+  params: ListMarketingSpendParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listMarketingSpend>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListMarketingSpendQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a manual marketing spend entry
+ */
+export const getCreateMarketingSpendUrl = () => {
+  return `/api/marketing-spend`;
+};
+
+export const createMarketingSpend = async (
+  createMarketingSpendInput: CreateMarketingSpendInput,
+  options?: RequestInit,
+): Promise<MarketingSpendEntry> => {
+  return customFetch<MarketingSpendEntry>(getCreateMarketingSpendUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createMarketingSpendInput),
+  });
+};
+
+export const getCreateMarketingSpendMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createMarketingSpend>>,
+    TError,
+    { data: BodyType<CreateMarketingSpendInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createMarketingSpend>>,
+  TError,
+  { data: BodyType<CreateMarketingSpendInput> },
+  TContext
+> => {
+  const mutationKey = ["createMarketingSpend"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createMarketingSpend>>,
+    { data: BodyType<CreateMarketingSpendInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createMarketingSpend(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateMarketingSpendMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createMarketingSpend>>
+>;
+export type CreateMarketingSpendMutationBody =
+  BodyType<CreateMarketingSpendInput>;
+export type CreateMarketingSpendMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Create a manual marketing spend entry
+ */
+export const useCreateMarketingSpend = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createMarketingSpend>>,
+    TError,
+    { data: BodyType<CreateMarketingSpendInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createMarketingSpend>>,
+  TError,
+  { data: BodyType<CreateMarketingSpendInput> },
+  TContext
+> => {
+  return useMutation(getCreateMarketingSpendMutationOptions(options));
+};
+
+/**
+ * @summary Delete a marketing spend entry
+ */
+export const getDeleteMarketingSpendUrl = (id: number) => {
+  return `/api/marketing-spend/${id}`;
+};
+
+export const deleteMarketingSpend = async (
+  id: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteMarketingSpendUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteMarketingSpendMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteMarketingSpend>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteMarketingSpend>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteMarketingSpend"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteMarketingSpend>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteMarketingSpend(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteMarketingSpendMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteMarketingSpend>>
+>;
+
+export type DeleteMarketingSpendMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete a marketing spend entry
+ */
+export const useDeleteMarketingSpend = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteMarketingSpend>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteMarketingSpend>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteMarketingSpendMutationOptions(options));
+};
+
+/**
+ * @summary Bulk-import marketing spend from a CSV or XLSX file (e.g. exported from a Looker Studio / ad platform data source)
+ */
+export const getImportMarketingSpendUrl = () => {
+  return `/api/marketing-spend/import`;
+};
+
+export const importMarketingSpend = async (
+  importMarketingSpendInput: ImportMarketingSpendInput,
+  options?: RequestInit,
+): Promise<ImportMarketingSpendResult> => {
+  return customFetch<ImportMarketingSpendResult>(getImportMarketingSpendUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(importMarketingSpendInput),
+  });
+};
+
+export const getImportMarketingSpendMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof importMarketingSpend>>,
+    TError,
+    { data: BodyType<ImportMarketingSpendInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof importMarketingSpend>>,
+  TError,
+  { data: BodyType<ImportMarketingSpendInput> },
+  TContext
+> => {
+  const mutationKey = ["importMarketingSpend"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof importMarketingSpend>>,
+    { data: BodyType<ImportMarketingSpendInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return importMarketingSpend(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ImportMarketingSpendMutationResult = NonNullable<
+  Awaited<ReturnType<typeof importMarketingSpend>>
+>;
+export type ImportMarketingSpendMutationBody =
+  BodyType<ImportMarketingSpendInput>;
+export type ImportMarketingSpendMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Bulk-import marketing spend from a CSV or XLSX file (e.g. exported from a Looker Studio / ad platform data source)
+ */
+export const useImportMarketingSpend = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof importMarketingSpend>>,
+    TError,
+    { data: BodyType<ImportMarketingSpendInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof importMarketingSpend>>,
+  TError,
+  { data: BodyType<ImportMarketingSpendInput> },
+  TContext
+> => {
+  return useMutation(getImportMarketingSpendMutationOptions(options));
+};
+
+/**
+ * @summary Trigger a sync of products, retailers, and sale orders from Cin7 Core
+ */
+export const getTriggerCin7SyncUrl = () => {
+  return `/api/cin7/sync`;
+};
+
+export const triggerCin7Sync = async (
+  options?: RequestInit,
+): Promise<Cin7SyncResult> => {
+  return customFetch<Cin7SyncResult>(getTriggerCin7SyncUrl(), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getTriggerCin7SyncMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof triggerCin7Sync>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof triggerCin7Sync>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["triggerCin7Sync"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof triggerCin7Sync>>,
+    void
+  > = () => {
+    return triggerCin7Sync(requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type TriggerCin7SyncMutationResult = NonNullable<
+  Awaited<ReturnType<typeof triggerCin7Sync>>
+>;
+
+export type TriggerCin7SyncMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Trigger a sync of products, retailers, and sale orders from Cin7 Core
+ */
+export const useTriggerCin7Sync = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof triggerCin7Sync>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof triggerCin7Sync>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(getTriggerCin7SyncMutationOptions(options));
+};
+
+/**
+ * @summary Get last-sync status per resource
+ */
+export const getGetCin7SyncStatusUrl = () => {
+  return `/api/cin7/sync/status`;
+};
+
+export const getCin7SyncStatus = async (
+  options?: RequestInit,
+): Promise<Cin7SyncState[]> => {
+  return customFetch<Cin7SyncState[]>(getGetCin7SyncStatusUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetCin7SyncStatusQueryKey = () => {
+  return [`/api/cin7/sync/status`] as const;
+};
+
+export const getGetCin7SyncStatusQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCin7SyncStatus>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getCin7SyncStatus>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCin7SyncStatusQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCin7SyncStatus>>
+  > = ({ signal }) => getCin7SyncStatus({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCin7SyncStatus>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetCin7SyncStatusQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCin7SyncStatus>>
+>;
+export type GetCin7SyncStatusQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get last-sync status per resource
+ */
+
+export function useGetCin7SyncStatus<
+  TData = Awaited<ReturnType<typeof getCin7SyncStatus>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getCin7SyncStatus>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCin7SyncStatusQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

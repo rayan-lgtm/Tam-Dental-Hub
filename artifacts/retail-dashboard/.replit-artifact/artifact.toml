@@ -1,0 +1,25 @@
+kind = "app"
+previewPath = "/retail-dashboard"
+title = "Retail Margins & Retailer KPIs"
+version = "1.0.0"
+id = "GFnNDhfzMm4ieWuKdAqHd"
+
+[[services]]
+localPort = 8082
+name = "Retail Dashboard"
+paths = ["/retail-dashboard"]
+
+[services.env]
+BASE_PATH = "/retail-dashboard"
+
+[services.development]
+run = "pnpm --filter @workspace/retail-dashboard run dev"
+
+[services.production]
+build = "pnpm --filter @workspace/retail-dashboard run build"
+
+[services.production.run]
+args = ["pnpm", "--filter", "@workspace/retail-dashboard", "run", "preview"]
+
+[services.production.run.env]
+PORT = "8082"

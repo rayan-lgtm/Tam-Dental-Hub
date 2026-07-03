@@ -6,4 +6,20 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./cin7SyncResult";
+export * from "./cin7SyncState";
+export * from "./createMarketingSpendInput";
+export * from "./dashboardSummary";
+export * from "./fromDateParameter";
+export * from "./getDashboardSummaryParams";
+export * from "./getProductMarginsParams";
+export * from "./getRetailerKpisParams";
 export * from "./healthStatus";
+export * from "./importMarketingSpendInput";
+export * from "./importMarketingSpendResult";
+export * from "./listMarketingSpendParams";
+export * from "./marketingSpendEntry";
+export * from "./productMargin";
+export * from "./retailerKpi";
+export * from "./retailerKpiAbcClass";
+export * from "./toDateParameter";
