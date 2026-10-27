@@ -116,7 +116,7 @@ App ID: `sa.tamdental.patient` (same for both platforms and both app versions)
 
 ## TAM Dental Asian Cup 2027 Predictions (`artifacts/asian-cup`)
 
-Mobile-first Arabic (RTL) web app (Vite + React + Tailwind, installable as a PWA) where participants predict Asian Cup 2027 results. Served at `/cup/`, admin dashboard at `/cup/admin`.
+Mobile-first Arabic (RTL) web app (Vite + React + Tailwind, installable as a PWA) where participants predict Asian Cup 2027 results. Served at the deployment root (production domain: `asiacup.tamdental.sa`), admin dashboard at `/admin`.
 
 - **Participants** register once with name + Saudi mobile + 4-digit PIN; returning users log in with mobile + PIN.
 - **Predictions**: match scores (locked at kickoff), knockout qualifier on predicted draws, group order (1st–4th), tournament champion.

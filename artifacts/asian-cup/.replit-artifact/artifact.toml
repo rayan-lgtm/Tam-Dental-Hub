@@ -1,5 +1,5 @@
 kind = "web"
-previewPath = "/cup/"
+previewPath = "/"
 title = "TAM Dental Asian Cup Predictions"
 version = "1.0.0"
 id = "artifacts/asian-cup"
@@ -7,11 +7,11 @@ id = "artifacts/asian-cup"
 [[services]]
 localPort = 8082
 name = "Asian Cup Predictions"
-paths = ["/cup"]
+paths = ["/"]
 
 [services.env]
 PORT = "8082"
-BASE_PATH = "/cup/"
+BASE_PATH = "/"
 
 [services.development]
 run = "pnpm --filter @workspace/asian-cup run dev"
