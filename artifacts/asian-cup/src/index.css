@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --color-brand: #1691d0;
+  --color-brand-dark: #0d7bbf;
+  --color-brand-light: #87b3d4;
+  --color-brand-soft: #d0e8f5;
+  --color-navy: #161a3d;
+  --color-teal: #26717e;
+  --color-gold: #e3a92b;
+  --color-gold-soft: #fbf0d4;
+  --color-ink: #0d1b2a;
+  --color-muted: #6f7374;
+  --color-line: #e0edf7;
+  --color-page: #f4f8fc;
+}
+
+html,
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+}
+
+.hero-bg {
+  background:
+    radial-gradient(circle at 50% 135%, transparent 38%, rgba(255, 255, 255, 0.07) 38.5%, transparent 39.5%),
+    radial-gradient(120% 80% at 100% 0%, rgba(22, 145, 208, 0.45) 0%, transparent 60%),
+    linear-gradient(160deg, #161a3d 0%, #1f3a5c 55%, #26717e 100%);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

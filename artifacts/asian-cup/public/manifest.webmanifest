@@ -1,0 +1,12 @@
+{
+  "name": "تحدي توقعات كأس آسيا 2027 | تام دنتال",
+  "short_name": "توقعات تام",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F4F8FC",
+  "theme_color": "#161a3d",
+  "icons": [{ "src": "icon.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }]
+}
