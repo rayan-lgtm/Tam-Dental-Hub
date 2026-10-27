@@ -1,11 +1,11 @@
-import { ChevronLeft, Info, Sparkles, Trophy, Medal } from "lucide-react";
+import { ChevronLeft, Info, MessageCircle, Sparkles, Trophy, Medal } from "lucide-react";
 import { now, useApp } from "../store";
 import { Card, SectionTitle } from "../components/ui";
 import { MatchCard } from "../components/MatchCard";
 import { BOARD_NAMES } from "../types";
 import { countdown } from "../format";
+import { CLINIC_URL, whatsappLink } from "../contact";
 
-export const CLINIC_URL = "https://tamdental.sa";
 
 export default function Home() {
   const { meta, matches, me, go } = useApp();
@@ -101,18 +101,28 @@ export default function Home() {
         <ChevronLeft className="size-5 text-brand" />
       </button>
 
-      <a
-        href={CLINIC_URL}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-4 block overflow-hidden rounded-2xl bg-gradient-to-l from-teal to-navy p-4 text-white"
-      >
+      <div className="mt-4 overflow-hidden rounded-2xl bg-gradient-to-l from-teal to-navy p-4 text-white">
         <p className="text-sm font-bold">ابتسامة البطل تبدأ من تام دنتال 🦷</p>
         <p className="mt-1 text-xs text-white/75">احجز موعدك واحتفل بالفوز بابتسامة واثقة</p>
-        <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold text-navy">
-          احجز الآن <ChevronLeft className="size-3.5" />
-        </span>
-      </a>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <a
+            href={whatsappLink("مرحباً تام دنتال، أبغى أحجز موعد (من مسابقة توقعات كأس آسيا)")}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] px-3.5 py-1.5 text-xs font-semibold text-white"
+          >
+            <MessageCircle className="size-3.5" /> احجز عبر واتساب
+          </a>
+          <a
+            href={CLINIC_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-navy"
+          >
+            موقع تام دنتال <ChevronLeft className="size-3.5" />
+          </a>
+        </div>
+      </div>
 
       <button
         onClick={() => go("rules")}

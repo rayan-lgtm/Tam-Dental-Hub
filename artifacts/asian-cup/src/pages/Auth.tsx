@@ -4,6 +4,7 @@ import { api } from "../api";
 import { Button } from "../components/ui";
 import type { Meta } from "../types";
 import { fmtDateTime } from "../format";
+import { whatsappLink } from "../contact";
 
 export default function Auth({ meta, onAuthed }: { meta: Meta; onAuthed: (token: string) => void }) {
   const [mode, setMode] = useState<"register" | "login">("register");
@@ -134,7 +135,17 @@ export default function Auth({ meta, onAuthed }: { meta: Meta; onAuthed: (token:
             {mode === "register" ? "سجّل وابدأ التوقع" : "دخول"}
           </Button>
           {mode === "login" && (
-            <p className="mt-3 text-center text-xs text-muted">نسيت الرقم السري؟ تواصل مع تام دنتال لإعادة تعيينه.</p>
+            <p className="mt-3 text-center text-xs text-muted">
+              نسيت الرقم السري؟{" "}
+              <a
+                href={whatsappLink(`مرحباً تام دنتال، نسيت الرقم السري لمسابقة توقعات كأس آسيا. رقم جوالي: ${phone}`)}
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-[#128C7E] underline-offset-2 hover:underline"
+              >
+                تواصل معنا عبر واتساب
+              </a>
+            </p>
           )}
         </form>
 
