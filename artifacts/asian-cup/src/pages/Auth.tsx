@@ -39,10 +39,7 @@ export default function Auth({ meta, onAuthed }: { meta: Meta; onAuthed: (token:
   return (
     <div className="mx-auto min-h-dvh max-w-md bg-page">
       <section className="hero-bg relative overflow-hidden px-6 pb-20 pt-[max(env(safe-area-inset-top),28px)] text-white">
-        <div className="flex items-center gap-2.5">
-          <img src={`${import.meta.env.BASE_URL}icon.png`} alt="TAM Dental" className="size-10 rounded-xl ring-1 ring-white/20" />
-          <span className="text-sm font-semibold tracking-wide">TAM Dental | تام دنتال</span>
-        </div>
+        <img src={`${import.meta.env.BASE_URL}logo-light.png`} alt="تام دنتال TAM Dental" className="h-11 w-auto" />
         <div className="mt-8 flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-medium text-gold">كأس آسيا • السعودية 2027 🇸🇦</p>

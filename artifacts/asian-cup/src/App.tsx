@@ -76,7 +76,7 @@ export default function App() {
   if (!meta) {
     return (
       <div className="hero-bg flex min-h-dvh flex-col items-center justify-center gap-4 text-white">
-        <img src={`${import.meta.env.BASE_URL}icon.png`} alt="" className="size-16 rounded-2xl" />
+        <img src={`${import.meta.env.BASE_URL}logo-light.png`} alt="تام دنتال TAM Dental" className="h-14 w-auto" />
         {error ? (
           <>
             <p className="px-8 text-center text-sm">{error}</p>

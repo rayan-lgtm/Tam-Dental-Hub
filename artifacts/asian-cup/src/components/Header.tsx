@@ -7,15 +7,16 @@ export function Header() {
   return (
     <header className="hero-bg sticky top-0 z-20 px-4 pb-3 pt-[max(env(safe-area-inset-top),12px)] text-white">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <img src={`${import.meta.env.BASE_URL}icon.png`} alt="TAM Dental" className="size-9 rounded-xl ring-1 ring-white/20" />
+        <div className="flex items-center gap-3">
+          <img src={`${import.meta.env.BASE_URL}logo-light.png`} alt="تام دنتال TAM Dental" className="h-8 w-auto" />
+          <span className="h-7 w-px bg-white/20" />
           <div className="leading-tight">
             <p className="text-[13px] font-bold">تحدي توقعات كأس آسيا</p>
-            <p className="text-[11px] text-white/70">تام دنتال • {stage?.name}</p>
+            <p className="text-[11px] text-white/70">{stage?.name}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="max-w-28 truncate text-xs text-white/80">{me.participant.name}</span>
+          <span className="max-w-20 truncate text-xs text-white/80">{me.participant.name}</span>
           <button
             onClick={logout}
             aria-label="تسجيل الخروج"

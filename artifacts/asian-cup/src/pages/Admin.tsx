@@ -60,7 +60,7 @@ export default function Admin() {
           }}
           className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-xl"
         >
-          <img src={`${import.meta.env.BASE_URL}icon.png`} alt="" className="mx-auto size-14 rounded-2xl" />
+          <img src={`${import.meta.env.BASE_URL}logo.png`} alt="تام دنتال TAM Dental" className="mx-auto h-14 w-auto" />
           <h1 className="mt-3 text-center text-lg font-bold text-navy">لوحة إدارة مسابقة كأس آسيا</h1>
           <label className="mt-5 flex items-center gap-2 rounded-xl border border-line px-3 py-3">
             <KeyRound className="size-4 text-brand-light" />
@@ -114,7 +114,8 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
     <div className="mx-auto min-h-dvh max-w-3xl pb-16">
       <header className="hero-bg sticky top-0 z-20 flex items-center justify-between px-4 py-3 text-white">
         <div className="flex items-center gap-2">
-          <img src={`${import.meta.env.BASE_URL}icon.png`} alt="" className="size-8 rounded-lg" />
+          <img src={`${import.meta.env.BASE_URL}logo-light.png`} alt="تام دنتال TAM Dental" className="h-7 w-auto" />
+          <span className="h-6 w-px bg-white/20" />
           <span className="text-sm font-bold">إدارة مسابقة التوقعات</span>
         </div>
         <div className="flex gap-2">
