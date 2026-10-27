@@ -111,3 +111,18 @@ store/
 ```
 
 App ID: `sa.tamdental.patient` (same for both platforms and both app versions)
+
+---
+
+## TAM Dental Asian Cup 2027 Predictions (`artifacts/asian-cup`)
+
+Mobile-first Arabic (RTL) web app (Vite + React + Tailwind, installable as a PWA) where participants predict Asian Cup 2027 results. Served at the deployment root (production domain: `asiacup.tamdental.sa`), admin dashboard at `/admin`.
+
+- **Participants** register once with name + Saudi mobile + 4-digit PIN; returning users log in with mobile + PIN.
+- **Predictions**: match scores (locked at kickoff), knockout qualifier on predicted draws, group order (1st–4th), tournament champion.
+- **Scoring** (`artifacts/api-server/src/cup/scoring.ts`): winner/draw vs exact score per stage (group 3/8, R16 4/10, QF 5/12, SF 6/15, final 8/20), +2 correct qualifier, +40 champion (overall only), group-order 10/5/2/0 per team (separate board).
+- **Boards**: one per stage (counter starts from zero each stage), group-order board, overall. Ties: exact scores → correct outcomes → correct qualifiers.
+- **Admin** (`x-admin-key` = `CUP_ADMIN_KEY` env var): enter results and knockout teams (winners auto-advance), approve group standings, set current stage / deadlines / champion, announce top-3 winners per board, export participants CSV, reset PINs.
+- **Contact**: clinic URL and WhatsApp number (966920033363) live in `artifacts/asian-cup/src/contact.ts`.
+- **API**: `artifacts/api-server/src/cup/` mounted at `/api/cup`. Fixtures are seeded on first request.
+- **DB**: `lib/db/src/schema/cup.ts` — run `pnpm --filter @workspace/db run push` after deploying.
