@@ -24,6 +24,7 @@ pnpm workspace monorepo using TypeScript. Contains a TAM Dental Patient mobile a
 artifacts-monorepo/
 ├── artifacts/              # Deployable applications
 │   ├── api-server/         # Express API server
+│   ├── call-quality/       # Call-center QA dashboard (served at /qa)
 │   ├── tam-dental/         # TAM Dental Patient Expo mobile app (primary)
 │   └── tam-dental-angular/ # TAM Dental Angular/Ionic version (for stores)
 ├── lib/                    # Shared libraries
@@ -126,3 +127,16 @@ Mobile-first Arabic (RTL) web app (Vite + React + Tailwind, installable as a PWA
 - **Contact**: clinic URL and WhatsApp number (966920033363) live in `artifacts/asian-cup/src/contact.ts`.
 - **API**: `artifacts/api-server/src/cup/` mounted at `/api/cup`. Fixtures are seeded on first request.
 - **DB**: `lib/db/src/schema/cup.ts` — run `pnpm --filter @workspace/db run push` after deploying.
+
+---
+
+## TAM Dental Call Quality Agent (`artifacts/call-quality`)
+
+Arabic (RTL) dashboard at `/qa/` + API at `/api/qa`. Daily samples (3-5 per agent per channel) of calls (Ittisalna) and chats (respond.io) are evaluated by Claude against a 10-criterion hospitality rubric (`artifacts/api-server/src/qa/rubric.ts`); overall 0-100 is computed in code from weighted criteria, critical errors cap it at 40.
+
+- **Ingest**: `POST /api/qa/ingest` (`x-qa-key` = `QA_INGEST_KEY`), agents matched by respond.io id / Ittisalna extension / name. Recordings without transcripts are transcribed (ElevenLabs, `ELEVENLABS_API_KEY`) only when sampled.
+- **Daily job**: `POST /api/qa/jobs/daily` (optional `{date}`), call from an external scheduler.
+- **Dashboard** (`x-qa-key` = `QA_ADMIN_KEY`): team overview, per-agent report split calls/chat, conversation detail, manual paste-and-evaluate, rubric, demo data.
+- **Env**: `ANTHROPIC_API_KEY` (required), `QA_ADMIN_KEY`, `QA_INGEST_KEY`, optional `QA_MODEL`, `QA_EFFORT`, `QA_SAMPLES_PER_DAY`.
+- **DB**: `lib/db/src/schema/qa.ts` — run `pnpm --filter @workspace/db run push` after deploying.
+- Full guide (Arabic): `artifacts/call-quality/README.md`. Same rubric as a Claude skill: `.claude/skills/tam-call-qa/SKILL.md`.

@@ -9,6 +9,9 @@ id = "artifacts/mockup-sandbox"
 [[artifacts]]
 id = "artifacts/asian-cup"
 
+[[artifacts]]
+id = "artifacts/call-quality"
+
 [deployment]
 router = "application"
 deploymentTarget = "autoscale"
