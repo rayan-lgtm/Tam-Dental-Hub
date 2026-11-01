@@ -1,9 +1,11 @@
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, like } from "drizzle-orm";
 import {
   db,
   qaAgentsTable,
   qaInteractionsTable,
   qaEvaluationsTable,
+  qaBookingsTable,
+  qaVolumeTable,
   type QaChannel,
   type QaCriterionResult,
   type QaIssue,
@@ -15,11 +17,13 @@ import { addDays, dayStart, todayKey } from "./service";
 // Everything here is tagged source = "demo" and can be removed from the dashboard.
 
 const DEMO_AGENTS = [
-  { name: "نورة (تجريبي)", branch: "الرياض — العليا", base: 4.4 },
-  { name: "ريم (تجريبي)", branch: "الرياض — الملقا", base: 3.9 },
-  { name: "سارة (تجريبي)", branch: "جدة — الروضة", base: 3.4 },
-  { name: "هيفاء (تجريبي)", branch: "الرياض — العليا", base: 2.9 },
+  { name: "نورة (تجريبي)", branch: "الرياض — العليا", base: 4.4, team: "organic" as const },
+  { name: "ريم (تجريبي)", branch: "الرياض — الملقا", base: 3.9, team: "sales" as const },
+  { name: "سارة (تجريبي)", branch: "جدة — الروضة", base: 3.4, team: "organic" as const },
+  { name: "هيفاء (تجريبي)", branch: "الرياض — العليا", base: 2.9, team: "sales" as const },
 ];
+
+const DOCTORS = ["د. عبدالإله", "د. نادر", "د. فرح", "د. حمد", "د. لمى"];
 
 const TRANSCRIPTS: Record<QaChannel, string[]> = {
   call: [
@@ -115,7 +119,7 @@ export async function seedDemo(days = 30) {
   await clearDemo();
   const agents = await db
     .insert(qaAgentsTable)
-    .values(DEMO_AGENTS.map((a) => ({ name: a.name, branch: a.branch })))
+    .values(DEMO_AGENTS.map((a) => ({ name: a.name, branch: a.branch, team: a.team })))
     .returning();
 
   const today = todayKey();
@@ -127,6 +131,7 @@ export async function seedDemo(days = 30) {
       const day = addDays(today, -d);
       // Agents improve slightly over the month — that's the point of daily coaching.
       const drift = ((days - d) / days) * 0.4;
+      await seedProductivity(agent.id, DEMO_AGENTS[idx]!.team, base, day, d);
       for (const channel of ["call", "chat"] as QaChannel[]) {
         const n = 3 + Math.floor(Math.random() * 3);
         for (let k = 0; k < n; k++) {
@@ -179,7 +184,53 @@ export async function seedDemo(days = 30) {
       }
     }
   }
+  // Online self-bookings and bookings by employees missing from GHL, per day.
+  const extra: (typeof qaBookingsTable.$inferInsert)[] = [];
+  for (let d = days - 1; d >= 0; d--) {
+    const day = addDays(today, -d);
+    for (const [kind, n] of [["online", 2], ["unassigned", 6]] as const) {
+      for (let k = 0; k < n + Math.floor(Math.random() * 3); k++) {
+        extra.push(demoBooking(`demo-${kind}-${day}-${k}`, pick(["sales", "organic"] as const), kind, null, day, d, 0.82));
+      }
+    }
+  }
+  await db.insert(qaBookingsTable).values(extra);
   return { agents: agents.length };
+}
+
+/** Inbound volume and bookings for one agent-day; better agents convert and retain more. */
+async function seedProductivity(agentId: number, team: "sales" | "organic", base: number, day: string, daysAgo: number) {
+  const calls = Math.round(rand(14, 26));
+  const chats = Math.round(rand(20, 40));
+  await db.insert(qaVolumeTable).values([
+    { agentId, day, channel: "call", inbound: calls },
+    { agentId, day, channel: "chat", inbound: chats },
+  ]);
+  const conversion = 0.08 + (base - 2.5) * 0.06 + rand(-0.03, 0.03);
+  const n = Math.max(0, Math.round((calls + chats) * conversion));
+  const showProb = 0.55 + (base - 2.5) * 0.17;
+  const rows = Array.from({ length: n }, (_, k) =>
+    demoBooking(`demo-${agentId}-${day}-${k}`, team, "staff", agentId, day, daysAgo, showProb),
+  );
+  if (rows.length) await db.insert(qaBookingsTable).values(rows);
+}
+
+function demoBooking(
+  id: string,
+  team: "sales" | "organic",
+  kind: "staff" | "online" | "unassigned",
+  agentId: number | null,
+  day: string,
+  daysAgo: number,
+  showProb: number,
+): typeof qaBookingsTable.$inferInsert {
+  const bookedAt = new Date(dayStart(day).getTime() + rand(9, 21) * 3600_000);
+  const leadDays = Math.round(rand(1, 14));
+  const startTime = new Date(bookedAt.getTime() + leadDays * 86400_000);
+  const visited = leadDays < daysAgo;
+  const r = Math.random();
+  const status = r < 0.2 ? "cancelled" : !visited ? pick(["new", "confirmed"]) : Math.random() < showProb ? "showed" : "noshow";
+  return { id, team, kind, agentId, ghlUserId: null, status, doctor: pick(DOCTORS), bookedAt, startTime };
 }
 
 export async function clearDemo() {
@@ -188,6 +239,7 @@ export async function clearDemo() {
     .from(qaInteractionsTable)
     .where(eq(qaInteractionsTable.source, "demo"));
   await db.delete(qaInteractionsTable).where(eq(qaInteractionsTable.source, "demo"));
+  await db.delete(qaBookingsTable).where(like(qaBookingsTable.id, "demo-%"));
   const ids = demoAgents.map((a) => a.id);
   if (ids.length) {
     // Only remove agents that have no real data left

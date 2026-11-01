@@ -15,6 +15,7 @@ export interface Meta {
   target: number;
   evaluator: boolean;
   transcription: boolean;
+  ghl: boolean;
   today: string;
 }
 
@@ -24,6 +25,8 @@ export interface Agent {
   branch: string | null;
   respondIoId: string | null;
   ittisalnaExt: string | null;
+  ghlUserId: string | null;
+  team: "sales" | "organic" | null;
   active: boolean;
 }
 
@@ -151,4 +154,43 @@ export interface InteractionRow {
   overall: number | null;
   summary: string | null;
   outcome: string | null;
+}
+
+export type Team = "sales" | "organic";
+
+export interface FunnelCounts {
+  bookings: number;
+  showed: number;
+  noshow: number;
+  cancelled: number;
+  upcoming: number;
+}
+
+export interface FunnelRates {
+  showRate: number | null;
+  cancelRate: number | null;
+  noshowRate: number | null;
+  conversion: number | null;
+  showedPerContact: number | null;
+}
+
+export interface ProductivityRow extends FunnelCounts, FunnelRates {
+  id: number;
+  name: string;
+  team: Team | null;
+  calls: number | null;
+  chats: number | null;
+  contacts: number | null;
+  qa: number | null;
+}
+
+export interface Productivity {
+  team: Team | "all";
+  volumeConnected: boolean;
+  totals: FunnelCounts & FunnelRates;
+  staff: { bookings: number; contacts: number | null; conversion: number | null };
+  online: FunnelCounts & FunnelRates;
+  unassigned: FunnelCounts & { share: number | null };
+  agents: ProductivityRow[];
+  daily: (FunnelCounts & { day: string; contacts: number })[];
 }

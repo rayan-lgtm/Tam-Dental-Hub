@@ -1,13 +1,15 @@
 import { Phone, MessageCircle, ClipboardCheck, AlertTriangle, CalendarCheck, Target, ChevronLeft } from "lucide-react";
 import { useFetch, useRange } from "../hooks";
 import { OUTCOME_LABEL, RANGES, fmtDateTime, tone } from "../format";
-import type { Meta, Overview } from "../types";
+import type { Meta, Overview, Productivity } from "../types";
 import { Card, CardTitle, ChannelBadge, Empty, ErrorBox, ScorePill, ScoreRing, Segmented, Spinner, Stat } from "../components/ui";
 import { CriteriaBars, OutcomeBar, TrendChart } from "../components/charts";
 
 export default function Dashboard({ meta }: { meta: Meta }) {
   const { range, setRange, query } = useRange();
   const { data, error, loading } = useFetch<Overview>(`/overview?${query}`);
+  const prod = useFetch<Productivity>(`/productivity?${query}`);
+  const prodOf = (id: number) => prod.data?.agents.find((a) => a.id === id);
 
   return (
     <div className="space-y-4">
@@ -73,7 +75,7 @@ export default function Dashboard({ meta }: { meta: Meta }) {
               <CardTitle>تقييم الموظفات</CardTitle>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] text-sm">
+              <table className="w-full min-w-[900px] text-sm">
                 <thead className="bg-page text-xs text-muted">
                   <tr>
                     <th className="px-4 py-2 text-start font-semibold">#</th>
@@ -82,6 +84,8 @@ export default function Dashboard({ meta }: { meta: Meta }) {
                     <th className="px-2 py-2 text-center font-semibold">المكالمات</th>
                     <th className="px-2 py-2 text-center font-semibold">الشات</th>
                     <th className="px-2 py-2 text-center font-semibold">العينات</th>
+                    <th className="px-2 py-2 text-center font-semibold">حجوزات / حضر</th>
+                    <th className="px-2 py-2 text-center font-semibold">نسبة الحضور</th>
                     <th className="px-2 py-2 text-start font-semibold">أقوى نقطة</th>
                     <th className="px-2 py-2 text-start font-semibold">أولوية التطوير</th>
                     <th />
@@ -111,6 +115,19 @@ export default function Dashboard({ meta }: { meta: Meta }) {
                       <td className="tabular px-2 py-2.5 text-center text-muted">
                         {a.call.count} / {a.chat.count}
                         {a.critical ? <span className="ms-1 text-bad">⚠ {a.critical}</span> : null}
+                      </td>
+                      <td className="tabular px-2 py-2.5 text-center">
+                        {prodOf(a.id)?.bookings ? (
+                          <>
+                            <b>{prodOf(a.id)!.bookings}</b> <span className="text-muted">/</span>{" "}
+                            <span className="text-good">{prodOf(a.id)!.showed}</span>
+                          </>
+                        ) : (
+                          <span className="text-muted">—</span>
+                        )}
+                      </td>
+                      <td className={`tabular px-2 py-2.5 text-center font-semibold ${tone(prodOf(a.id)?.showRate ?? null).text}`}>
+                        {prodOf(a.id)?.showRate != null ? `${prodOf(a.id)!.showRate}٪` : "—"}
                       </td>
                       <td className="px-2 py-2.5 text-xs text-good">{a.strongest ?? "—"}</td>
                       <td className="px-2 py-2.5 text-xs text-warn">{a.weakest ?? "—"}</td>

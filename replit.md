@@ -136,6 +136,7 @@ Arabic (RTL) dashboard at `/qa/` + API at `/api/qa`. Daily samples (3-5 per agen
 
 - **Ingest**: `POST /api/qa/ingest` (`x-qa-key` = `QA_INGEST_KEY`), agents matched by respond.io id / Ittisalna extension / name. Recordings without transcripts are transcribed (ElevenLabs, `ELEVENLABS_API_KEY`) only when sampled.
 - **Daily job**: `POST /api/qa/jobs/daily` (optional `{date}`), call from an external scheduler.
+- **Productivity**: bookings mirrored read-only from GHL (`POST /api/qa/jobs/ghl-sync`, `GHL_API_TOKEN`): Sales Calendar = sales team, Organic Calendar = customer service; appointment owner = booking employee, the online user = patient self-booking, "Dentaltap System" = employee without a GHL account. Inbound call/chat counts arrive via `POST /api/qa/volume`. Page `#/prod` shows inbound → bookings → showed/no-show/cancelled per agent with show rate and conversion.
 - **Dashboard** (`x-qa-key` = `QA_ADMIN_KEY`): team overview, per-agent report split calls/chat, conversation detail, manual paste-and-evaluate, rubric, demo data.
 - **Env**: `ANTHROPIC_API_KEY` (required), `QA_ADMIN_KEY`, `QA_INGEST_KEY`, optional `QA_MODEL`, `QA_EFFORT`, `QA_SAMPLES_PER_DAY`.
 - **DB**: `lib/db/src/schema/qa.ts` — run `pnpm --filter @workspace/db run push` after deploying.

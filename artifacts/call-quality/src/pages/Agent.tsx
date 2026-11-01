@@ -2,7 +2,8 @@ import { ArrowRight, Phone, MessageCircle, Sparkles, AlertCircle, Lightbulb, Ale
 import { useState } from "react";
 import { useFetch, useRange } from "../hooks";
 import { OUTCOME_LABEL, RANGES, SEVERITY_LABEL, fmtDateTime, tone } from "../format";
-import type { AgentReport, Channel, Meta } from "../types";
+import type { AgentReport, Channel, Meta, ProductivityRow } from "../types";
+import { FunnelBar, TEAM_LABEL } from "./Productivity";
 import { Card, CardTitle, ChannelBadge, Empty, ErrorBox, ScorePill, ScoreRing, Segmented, Spinner } from "../components/ui";
 import { CriteriaBars, OutcomeBar, TrendChart } from "../components/charts";
 
@@ -11,6 +12,7 @@ export default function AgentPage({ id }: { id: number; meta: Meta }) {
   const { data, error, loading } = useFetch<AgentReport>(`/agents/${id}/report?${query}`);
   const [filter, setFilter] = useState<"all" | Channel>("all");
   const [shown, setShown] = useState(20);
+  const prod = useFetch<ProductivityRow | null>(`/agents/${id}/productivity?${query}`);
 
   return (
     <div className="space-y-4">
@@ -20,12 +22,15 @@ export default function AgentPage({ id }: { id: number; meta: Meta }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold">{data?.agent.name ?? "…"}</h1>
-          {data?.agent.branch ? <p className="text-sm text-muted">{data.agent.branch}</p> : null}
+          <p className="text-sm text-muted">
+            {[data?.agent.team ? `فريق ${TEAM_LABEL[data.agent.team]}` : null, data?.agent.branch].filter(Boolean).join(" · ")}
+          </p>
         </div>
         <Segmented items={RANGES} value={range} onChange={setRange} />
       </div>
 
       {error ? <ErrorBox message={error} /> : null}
+      {prod.data ? <AgentFunnel row={prod.data} /> : null}
       {!data ? (
         <div className="flex justify-center py-20">{loading ? <Spinner /> : null}</div>
       ) : data.count === 0 ? (
@@ -217,4 +222,31 @@ function ChannelCard({ icon, title, stats }: { icon: React.ReactNode; title: str
 export function SeverityTag({ severity }: { severity: "low" | "medium" | "high" }) {
   const cls = { high: "bg-bad/10 text-bad", medium: "bg-warn/10 text-warn", low: "bg-page text-muted" }[severity];
   return <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${cls}`}>خطورة {SEVERITY_LABEL[severity]}</span>;
+}
+
+function AgentFunnel({ row }: { row: ProductivityRow }) {
+  const cells: [string, number | string | null, string][] = [
+    ["مكالمات واردة", row.calls, ""],
+    ["شات وارد", row.chats, ""],
+    ["حجوزات", row.bookings, "font-bold"],
+    ["حضر", row.showed, "text-good"],
+    ["لم يحضر", row.noshow, "text-bad"],
+    ["ألغى", row.cancelled, "text-warn"],
+    ["قادم", row.upcoming, "text-muted"],
+    ["نسبة الحضور", row.showRate != null ? `${row.showRate}٪` : null, ""],
+    ["تحويل التواصل لحجز", row.conversion != null ? `${row.conversion}٪` : null, ""],
+  ];
+  return (
+    <Card>
+      <CardTitle action={<FunnelBar row={row} />}>الحجوزات والجدوى</CardTitle>
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-9">
+        {cells.map(([label, v, cls]) => (
+          <div key={label} className="rounded-xl bg-page px-2 py-2 text-center">
+            <div className={`tabular text-lg font-bold ${cls}`}>{v ?? "—"}</div>
+            <div className="text-[10px] text-muted">{label}</div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
 }

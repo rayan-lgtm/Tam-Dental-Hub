@@ -14,6 +14,50 @@
 | **لكل موظفة** | تقييم شامل + مقسّم (مكالمات / شات)، تطور يومي خلال الشهر، أقوى نقطة وأولوية التطوير، المشكلات المتكررة، خطة تدريب |
 | **للفريق** | ترتيب الموظفات، اتجاه الأداء مقابل الهدف (85)، أولويات التدريب للفريق، الأخطاء الحرجة، نسبة الحجز، أسوأ وأفضل المحادثات للمراجعة والتدريب |
 
+## الإنتاجية والحجوزات (صفحة «الإنتاجية والحجوزات»)
+
+لكل موظفة: **التواصل الوارد (مكالمات + شات) ← الحجوزات ← حضر / لم يحضر / ألغى / قادم**، مع:
+
+- **نسبة الحضور** = حضر ÷ (حضر + لم يحضر)
+- **تحويل التواصل لحجز** = الحجوزات ÷ (المكالمات + الشات الوارد)
+- **جودة المحادثات** من التقييم بجانبها، لربط الجودة بالنتيجة
+- تقسيم حسب الفريق: **المبيعات** (Sales Calendar) و**خدمة العملاء** (Organic Calendar)
+
+**مصدر الحجوزات: GHL (قراءة فقط).** الحجز يتم في DentalTap ويُنسخ إلى GHL، و«Appointment Owner» هو الموظفة التي حجزت. لا يتم الاتصال بـ DentalTap مباشرة.
+
+| مالك الموعد في GHL | التصنيف |
+|---|---|
+| اسم موظفة | يُحسب لها (وتُضاف للنظام تلقائياً بفريقها) |
+| Rayan Hassan | **حجز أونلاين** — المراجع حجز بنفسه من الموقع/التطبيق |
+| Dentaltap System | **بدون اسم** — موظفة موجودة في DentalTap وليس لها حساب في GHL |
+
+الحجوزات تُحسب بتاريخ **إنشاء الحجز** (عمل الموظفة في ذلك اليوم)، وحالتها تُحدَّث يومياً من GHL.
+لتقليل «بدون اسم»: أي موظفة جديدة في DentalTap تُضاف في نفس اليوم كمستخدم في GHL.
+
+### المزامنة اليومية مع GHL
+
+```http
+POST /api/qa/jobs/ghl-sync
+x-qa-key: <QA_INGEST_KEY>
+{}                                   ← افتراضياً: مواعيد آخر 60 يوماً والقادمة 120 يوماً
+{"from":"2026-09-01","to":"2026-11-30"}   ← أو فترة محددة
+```
+
+### أعداد المكالمات والشات الواردة (Zapier)
+
+```http
+POST /api/qa/volume
+x-qa-key: <QA_INGEST_KEY>
+{
+  "items": [
+    { "day": "2026-10-31", "channel": "chat", "inbound": 37, "agentRespondIoId": "u-77" },
+    { "day": "2026-10-31", "channel": "call", "inbound": 22, "agentExt": "201" }
+  ]
+}
+```
+
+إعادة إرسال نفس اليوم/القناة/الموظفة تستبدل العدد، فيمكن لـ Zap ليلي إرسال أعداد اليوم بأمان. الموظفة تُطابق بـ `agentRespondIoId` أو `agentExt` أو `agentGhlUserId` أو `agentName` أو `agentId`.
+
 ## المعايير
 
 مبنية على: COPC CX Standard، ISO 18295، أبحاث الحل من أول تواصل (SQM)، معايير الضيافة (Forbes Travel Guide / Ritz-Carlton)، وتجربة المريض (Press Ganey).
@@ -44,7 +88,7 @@ respond.io (شات) ─┐
                   ├─► POST /api/qa/ingest ─► قاعدة البيانات (pending)
 اتصالنا (مكالمات) ─┘        (كل المحادثات أو جزء منها)
                                    │
-          يومياً 11:30 م ─► POST /api/qa/jobs/daily
+          يومياً 11:30 م ─► POST /api/qa/jobs/daily   (+ POST /api/qa/jobs/ghl-sync للحجوزات)
                                    │  عينة 3-5 لكل موظفة لكل قناة
                                    │  (الأطول + الأقصر + عشوائي)
                                    ▼
@@ -104,6 +148,8 @@ Content-Type: application/json
 | `QA_ADMIN_KEY` | مفتاح دخول لوحة المتابعة |
 | `QA_INGEST_KEY` | مفتاح للأنظمة الخارجية (ingest + الجدولة اليومية) فقط |
 | `ELEVENLABS_API_KEY` | اختياري — لتفريغ تسجيلات المكالمات |
+| `GHL_API_TOKEN` | Private Integration Token من GHL بصلاحيات **قراءة فقط**: `calendars.readonly`, `calendars/events.readonly`, `users.readonly` — للحجوزات والحضور |
+| `GHL_SALES_CALENDAR_ID` / `GHL_ORGANIC_CALENDAR_ID` / `GHL_ONLINE_USER_ID` / `GHL_SYSTEM_USER_ID` | اختياري — القيم الافتراضية مضبوطة لحساب تام دنتال |
 | `QA_MODEL` | اختياري — الافتراضي `claude-opus-5-5` |
 | `QA_EFFORT` | اختياري — `low` / `medium` (افتراضي) / `high` |
 | `QA_SAMPLES_PER_DAY` | اختياري — 3 إلى 5 (افتراضي 4) لكل موظفة لكل قناة |
@@ -123,13 +169,15 @@ pnpm --filter @workspace/db run push   # إنشاء جداول qa_*
 ## الملفات
 
 ```
-lib/db/src/schema/qa.ts                  الجداول: qa_agents, qa_interactions, qa_evaluations
+lib/db/src/schema/qa.ts                  الجداول: qa_agents, qa_interactions, qa_evaluations, qa_bookings, qa_volume
 artifacts/api-server/src/qa/
   rubric.ts        المعايير والأوزان والأخطاء الحرجة وحساب التقييم
   evaluator.ts     استدعاء Claude بمخرجات JSON منظمة
   transcribe.ts    التفريغ الصوتي للمكالمات (ElevenLabs)
   service.ts       العينة اليومية، التقييم، تقارير الفريق والموظفة
   routes.ts        /api/qa/*
+  ghl.ts           مزامنة الحجوزات من GHL (قراءة فقط) وتصنيفها
+  productivity.ts  حساب الإنتاجية: التواصل ← الحجز ← الحضور
   demo.ts          بيانات تجريبية
 artifacts/call-quality/                  لوحة المتابعة (React + Vite) على /qa/
 .claude/skills/tam-call-qa/SKILL.md      نفس المعايير كمهارة لاستخدامها مباشرة في Claude

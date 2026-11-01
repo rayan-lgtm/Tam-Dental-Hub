@@ -7,6 +7,7 @@ import {
   qaAgentsTable,
   qaInteractionsTable,
   qaEvaluationsTable,
+  qaVolumeTable,
   type QaAgent,
 } from "@workspace/db";
 import { CRITERIA, CRITICAL_FLAGS, GRADES, TARGET_SCORE } from "./rubric";
@@ -14,6 +15,8 @@ import { evaluatorConfigured } from "./evaluator";
 import { transcriptionConfigured } from "./transcribe";
 import { addDays, agentReport, dayStart, evaluateById, overview, runDaily, todayKey } from "./service";
 import { clearDemo, seedDemo } from "./demo";
+import { ghlConfigured, syncBookings } from "./ghl";
+import { agentProductivity, productivity } from "./productivity";
 
 const router: IRouter = Router();
 
@@ -77,6 +80,7 @@ const ingestItem = z
     agentRespondIoId: z.string().optional(),
     agentExt: z.string().optional(),
     agentName: z.string().optional(),
+    agentGhlUserId: z.string().optional(),
     occurredAt: z.string().datetime({ offset: true }).optional(),
     durationSec: z.number().int().nonnegative().optional(),
     customer: z.string().max(120).optional(),
@@ -85,12 +89,21 @@ const ingestItem = z
   })
   .refine((x) => x.transcript.trim() || x.recordingUrl, { message: "transcript or recordingUrl required" });
 
-async function resolveAgent(item: z.infer<typeof ingestItem>): Promise<QaAgent | null> {
+type AgentRef = {
+  agentId?: number;
+  agentRespondIoId?: string;
+  agentExt?: string;
+  agentName?: string;
+  agentGhlUserId?: string;
+};
+
+async function resolveAgent(item: AgentRef): Promise<QaAgent | null> {
   const conds: SQL[] = [];
   if (item.agentId) conds.push(eq(qaAgentsTable.id, item.agentId));
   if (item.agentRespondIoId) conds.push(eq(qaAgentsTable.respondIoId, item.agentRespondIoId));
   if (item.agentExt) conds.push(eq(qaAgentsTable.ittisalnaExt, item.agentExt));
   if (item.agentName) conds.push(eq(qaAgentsTable.name, item.agentName));
+  if (item.agentGhlUserId) conds.push(eq(qaAgentsTable.ghlUserId, item.agentGhlUserId));
   if (!conds.length) return null;
   const [agent] = await db.select().from(qaAgentsTable).where(or(...conds));
   return agent ?? null;
@@ -142,6 +155,64 @@ router.post(
   }),
 );
 
+/**
+ * Daily inbound volume per agent: how many calls (Ittisalna) and chats (respond.io) she received.
+ * Re-sending the same agent/day/channel overwrites the count, so a nightly Zap can resend safely.
+ */
+router.post(
+  "/volume",
+  requireKey(true),
+  wrap(async (req, res) => {
+    const item = z.object({
+      day: dateKey,
+      channel: z.enum(["call", "chat"]),
+      inbound: z.number().int().nonnegative(),
+      agentId: z.number().int().optional(),
+      agentRespondIoId: z.string().optional(),
+      agentExt: z.string().optional(),
+      agentName: z.string().optional(),
+      agentGhlUserId: z.string().optional(),
+    });
+    const body = parse(z.object({ items: z.array(item).min(1).max(2000) }), req.body, res);
+    if (!body) return;
+    let saved = 0;
+    const unmatched: string[] = [];
+    for (const v of body.items) {
+      const agent = await resolveAgent(v);
+      if (!agent) {
+        unmatched.push(v.agentName ?? v.agentExt ?? v.agentRespondIoId ?? v.agentGhlUserId ?? "?");
+        continue;
+      }
+      await db
+        .insert(qaVolumeTable)
+        .values({ agentId: agent.id, day: v.day, channel: v.channel, inbound: v.inbound })
+        .onConflictDoUpdate({
+          target: [qaVolumeTable.agentId, qaVolumeTable.day, qaVolumeTable.channel],
+          set: { inbound: v.inbound, updatedAt: new Date() },
+        });
+      saved++;
+    }
+    res.json({ saved, unmatched });
+  }),
+);
+
+/** Read-only GHL bookings sync. Default window: appointments from 60 days ago to 120 days ahead. */
+router.post(
+  "/jobs/ghl-sync",
+  requireKey(true),
+  wrap(async (req, res) => {
+    if (!ghlConfigured()) return bad(res, "GHL_API_TOKEN غير مضبوط", 503);
+    const today = todayKey();
+    const from = dateKey.safeParse(req.body?.from).data ?? addDays(today, -60);
+    const to = dateKey.safeParse(req.body?.to).data ?? addDays(today, 120);
+    try {
+      res.json(await syncBookings(dayStart(from), dayStart(addDays(to, 1))));
+    } catch (err) {
+      bad(res, `فشلت المزامنة مع GHL: ${err instanceof Error ? err.message : err}`, 502);
+    }
+  }),
+);
+
 // ---------- Dashboard (admin) ----------
 
 router.use(requireKey(false));
@@ -154,6 +225,7 @@ router.get("/meta", (_req, res) => {
     target: TARGET_SCORE,
     evaluator: evaluatorConfigured(),
     transcription: transcriptionConfigured(),
+    ghl: ghlConfigured(),
     today: todayKey(),
   });
 });
@@ -163,6 +235,23 @@ router.get(
   wrap(async (req, res) => {
     const { from, to } = range(req);
     res.json(await overview(from, to));
+  }),
+);
+
+router.get(
+  "/productivity",
+  wrap(async (req, res) => {
+    const { from, to } = range(req);
+    const team = z.enum(["sales", "organic"]).safeParse(req.query["team"]).data;
+    res.json(await productivity(from, to, team));
+  }),
+);
+
+router.get(
+  "/agents/:id/productivity",
+  wrap(async (req, res) => {
+    const { from, to } = range(req);
+    res.json(await agentProductivity(idParam(req), from, to));
   }),
 );
 
@@ -178,6 +267,8 @@ const agentBody = z.object({
   branch: z.string().trim().max(80).nullable().optional(),
   respondIoId: z.string().trim().max(120).nullable().optional(),
   ittisalnaExt: z.string().trim().max(40).nullable().optional(),
+  ghlUserId: z.string().trim().max(60).nullable().optional(),
+  team: z.enum(["sales", "organic"]).nullable().optional(),
   active: z.boolean().optional(),
 });
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { LayoutDashboard, PlusCircle, Settings as SettingsIcon, BookOpenCheck, LogOut, ListChecks } from "lucide-react";
+import { TrendingUp, LayoutDashboard, PlusCircle, Settings as SettingsIcon, BookOpenCheck, LogOut, ListChecks } from "lucide-react";
 import { api, auth, ApiError } from "./api";
 import type { Meta } from "./types";
 import { Spinner, ErrorBox } from "./components/ui";
@@ -11,12 +11,14 @@ import Conversations from "./pages/Conversations";
 import NewConversation from "./pages/NewConversation";
 import Settings from "./pages/Settings";
 import Rubric from "./pages/Rubric";
+import Productivity from "./pages/Productivity";
 
 type Route =
   | { page: "dashboard" }
   | { page: "agent"; id: number }
   | { page: "conv"; id: number }
   | { page: "list" }
+  | { page: "prod" }
   | { page: "new" }
   | { page: "settings" }
   | { page: "rubric" };
@@ -26,7 +28,7 @@ function parseHash(): Route {
   const [p, id] = h.split("/");
   if (p === "agent" && id) return { page: "agent", id: Number(id) };
   if (p === "conv" && id) return { page: "conv", id: Number(id) };
-  if (p === "list" || p === "new" || p === "settings" || p === "rubric") return { page: p };
+  if (p === "list" || p === "prod" || p === "new" || p === "settings" || p === "rubric") return { page: p };
   return { page: "dashboard" };
 }
 
@@ -36,6 +38,7 @@ export const go = (path: string) => {
 
 const NAV = [
   { path: "", page: "dashboard", label: "لوحة المتابعة", icon: LayoutDashboard },
+  { path: "prod", page: "prod", label: "الإنتاجية والحجوزات", icon: TrendingUp },
   { path: "list", page: "list", label: "المحادثات", icon: ListChecks },
   { path: "new", page: "new", label: "تقييم محادثة", icon: PlusCircle },
   { path: "rubric", page: "rubric", label: "معايير التقييم", icon: BookOpenCheck },
@@ -127,6 +130,8 @@ export default function App() {
           <AgentPage id={route.id} meta={meta} />
         ) : route.page === "conv" ? (
           <Conversation id={route.id} meta={meta} />
+        ) : route.page === "prod" ? (
+          <Productivity />
         ) : route.page === "list" ? (
           <Conversations />
         ) : route.page === "new" ? (

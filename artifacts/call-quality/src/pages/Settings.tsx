@@ -1,13 +1,13 @@
 import { useState, type FormEvent } from "react";
-import { Plus, Check, X, Database, PlayCircle, PlugZap, Pencil } from "lucide-react";
+import { Plus, Check, X, Database, PlayCircle, PlugZap, Pencil, RefreshCw } from "lucide-react";
 import { api } from "../api";
 import { useFetch } from "../hooks";
 import { addDays, todayKey } from "../format";
 import type { Agent, Meta } from "../types";
 import { Button, Card, CardTitle, Empty, ErrorBox, inputCls } from "../components/ui";
 
-type Draft = Pick<Agent, "name" | "branch" | "respondIoId" | "ittisalnaExt">;
-const emptyDraft: Draft = { name: "", branch: "", respondIoId: "", ittisalnaExt: "" };
+type Draft = Pick<Agent, "name" | "branch" | "respondIoId" | "ittisalnaExt" | "ghlUserId" | "team">;
+const emptyDraft: Draft = { name: "", branch: "", respondIoId: "", ittisalnaExt: "", ghlUserId: "", team: null };
 
 export default function Settings({ meta, onChanged }: { meta: Meta; onChanged: () => void }) {
   const agents = useFetch<Agent[]>("/agents");
@@ -37,6 +37,8 @@ export default function Settings({ meta, onChanged }: { meta: Meta; onChanged: (
     branch: d.branch?.trim() || null,
     respondIoId: d.respondIoId?.trim() || null,
     ittisalnaExt: d.ittisalnaExt?.trim() || null,
+    ghlUserId: d.ghlUserId?.trim() || null,
+    team: d.team || null,
   });
 
   const save = (e: FormEvent) => {
@@ -80,6 +82,18 @@ export default function Settings({ meta, onChanged }: { meta: Meta; onChanged: (
               onChange={(e) => setDraft({ ...draft, ittisalnaExt: e.target.value })}
               dir="ltr"
             />
+            <input
+              className={inputCls}
+              placeholder="معرّف الموظفة في GHL (يُضاف تلقائياً)"
+              value={draft.ghlUserId ?? ""}
+              onChange={(e) => setDraft({ ...draft, ghlUserId: e.target.value })}
+              dir="ltr"
+            />
+            <select className={inputCls} value={draft.team ?? ""} onChange={(e) => setDraft({ ...draft, team: (e.target.value || null) as Draft["team"] })}>
+              <option value="">الفريق…</option>
+              <option value="sales">المبيعات</option>
+              <option value="organic">خدمة العملاء</option>
+            </select>
             <div className="flex gap-2 sm:col-span-2">
               <Button type="submit" loading={busy === "save"}>
                 {editing ? <Check className="size-4" /> : <Plus className="size-4" />}
@@ -109,7 +123,7 @@ export default function Settings({ meta, onChanged }: { meta: Meta; onChanged: (
                   <div className="flex-1 text-sm">
                     <div className="font-semibold">{a.name}</div>
                     <div className="text-[11px] text-muted">
-                      {[a.branch, a.respondIoId && `respond.io: ${a.respondIoId}`, a.ittisalnaExt && `تحويلة: ${a.ittisalnaExt}`]
+                      {[a.team === "sales" ? "المبيعات" : a.team === "organic" ? "خدمة العملاء" : null, a.branch, a.respondIoId && `respond.io: ${a.respondIoId}`, a.ittisalnaExt && `تحويلة: ${a.ittisalnaExt}`]
                         .filter(Boolean)
                         .join(" · ") || "—"}
                     </div>
@@ -119,7 +133,7 @@ export default function Settings({ meta, onChanged }: { meta: Meta; onChanged: (
                     title="تعديل"
                     onClick={() => {
                       setEditing(a.id);
-                      setDraft({ name: a.name, branch: a.branch, respondIoId: a.respondIoId, ittisalnaExt: a.ittisalnaExt });
+                      setDraft({ name: a.name, branch: a.branch, respondIoId: a.respondIoId, ittisalnaExt: a.ittisalnaExt, ghlUserId: a.ghlUserId, team: a.team });
                     }}
                   >
                     <Pencil className="size-4" />
@@ -150,9 +164,33 @@ export default function Settings({ meta, onChanged }: { meta: Meta; onChanged: (
             <ul className="space-y-2 text-sm">
               <StatusRow ok={meta.evaluator} label="محرك التقييم (Claude)" hint="ANTHROPIC_API_KEY" />
               <StatusRow ok={meta.transcription} label="التفريغ الصوتي للمكالمات" hint="ELEVENLABS_API_KEY" />
+              <StatusRow ok={meta.ghl} label="GHL (الحجوزات والحضور)" hint="GHL_API_TOKEN" />
               <StatusRow ok={false} label="respond.io (الشات)" hint="قريباً — عبر /api/qa/ingest" />
               <StatusRow ok={false} label="اتصالنا (المكالمات)" hint="قريباً — عبر /api/qa/ingest" />
             </ul>
+          </Card>
+
+          <Card>
+            <CardTitle>
+              <span className="inline-flex items-center gap-1.5">
+                <RefreshCw className="size-4 text-brand" /> مزامنة الحجوزات من GHL
+              </span>
+            </CardTitle>
+            <p className="mb-3 text-xs leading-relaxed text-muted">
+              قراءة فقط من تقويمي المبيعات وOrganic: آخر 60 يوماً والمواعيد القادمة. تعمل يومياً تلقائياً، والموظفات الجديدات يُضفن تلقائياً بفريقهن.
+            </p>
+            <Button
+              loading={busy === "ghl"}
+              disabled={!meta.ghl}
+              onClick={() =>
+                run("ghl", async () => {
+                  const r = await api<{ upserted: number; newAgents: string[] }>("/jobs/ghl-sync", { method: "POST", body: {} });
+                  return `تمت مزامنة ${r.upserted} موعد${r.newAgents.length ? `، وأُضيفت: ${r.newAgents.join("، ")}` : ""}.`;
+                })
+              }
+            >
+              مزامنة الآن
+            </Button>
           </Card>
 
           <Card>
