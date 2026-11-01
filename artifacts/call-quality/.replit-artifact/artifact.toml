@@ -1,0 +1,21 @@
+kind = "web"
+previewPath = "/qa/"
+title = "TAM Dental Call Quality"
+version = "1.0.0"
+id = "artifacts/call-quality"
+
+[[services]]
+localPort = 8083
+name = "Call Quality Dashboard"
+paths = ["/qa"]
+
+[services.env]
+PORT = "8083"
+BASE_PATH = "/qa/"
+
+[services.development]
+run = "pnpm --filter @workspace/call-quality run dev"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/call-quality", "run", "build"]
+run = ["pnpm", "--filter", "@workspace/call-quality", "run", "serve"]

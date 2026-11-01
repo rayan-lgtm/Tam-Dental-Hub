@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --color-brand: #12b3bd;
+  --color-brand-dark: #077a83;
+  --color-brand-light: #c6ecef;
+  --color-brand-soft: #e2f6f7;
+  --color-navy: #0b1113;
+  --color-teal: #0e5c63;
+  --color-gold: #e3a92b;
+  --color-cyan: #34e0e8;
+  --color-ink: #0b1113;
+  --color-muted: #6f7374;
+  --color-line: #dcf0f2;
+  --color-page: #f3f9fa;
+  --color-good: #1f9d6b;
+  --color-warn: #d98a12;
+  --color-bad: #d64545;
+}
+
+html,
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
