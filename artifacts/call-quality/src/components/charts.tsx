@@ -3,8 +3,8 @@ import { fmtDay, fivePct, tone } from "../format";
 import type { CriterionAvg, DailyPoint } from "../types";
 
 const SERIES = [
-  { key: "call" as const, label: "المكالمات", color: "#26717e" },
-  { key: "chat" as const, label: "الشات", color: "#1691d0" },
+  { key: "call" as const, label: "المكالمات", color: "#0e5c63" },
+  { key: "chat" as const, label: "الشات", color: "#12b3bd" },
 ];
 
 /** Daily trend for calls vs chats with the target line. Plotted right-to-left to match RTL reading. */
@@ -131,8 +131,8 @@ export function OutcomeBar({ outcomes, labels }: { outcomes: { key: string; coun
   if (!total) return null;
   const colors: Record<string, string> = {
     booked: "#1f9d6b",
-    info_given: "#87b3d4",
-    follow_up: "#1691d0",
+    info_given: "#9fdde2",
+    follow_up: "#12b3bd",
     lost: "#d64545",
     complaint: "#d98a12",
     other: "#a0aab4",

@@ -84,7 +84,7 @@ export default function Settings({ meta, onChanged }: { meta: Meta; onChanged: (
             />
             <input
               className={inputCls}
-              placeholder="معرّف الموظفة في GHL (يُضاف تلقائياً)"
+              placeholder="معرّف الموظفة في Dental Shift (يُضاف تلقائياً)"
               value={draft.ghlUserId ?? ""}
               onChange={(e) => setDraft({ ...draft, ghlUserId: e.target.value })}
               dir="ltr"
@@ -164,7 +164,7 @@ export default function Settings({ meta, onChanged }: { meta: Meta; onChanged: (
             <ul className="space-y-2 text-sm">
               <StatusRow ok={meta.evaluator} label="محرك التقييم (Claude)" hint="ANTHROPIC_API_KEY" />
               <StatusRow ok={meta.transcription} label="التفريغ الصوتي للمكالمات" hint="ELEVENLABS_API_KEY" />
-              <StatusRow ok={meta.ghl} label="GHL (الحجوزات والحضور)" hint="GHL_API_TOKEN" />
+              <StatusRow ok={meta.ghl} label="Dental Shift (الحجوزات والحضور)" hint="DENTAL_SHIFT_API_TOKEN" />
               <StatusRow ok={false} label="respond.io (الشات)" hint="قريباً — عبر /api/qa/ingest" />
               <StatusRow ok={false} label="اتصالنا (المكالمات)" hint="قريباً — عبر /api/qa/ingest" />
             </ul>
@@ -173,7 +173,7 @@ export default function Settings({ meta, onChanged }: { meta: Meta; onChanged: (
           <Card>
             <CardTitle>
               <span className="inline-flex items-center gap-1.5">
-                <RefreshCw className="size-4 text-brand" /> مزامنة الحجوزات من GHL
+                <RefreshCw className="size-4 text-brand" /> مزامنة الحجوزات من Dental Shift
               </span>
             </CardTitle>
             <p className="mb-3 text-xs leading-relaxed text-muted">

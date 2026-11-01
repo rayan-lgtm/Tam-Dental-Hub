@@ -201,14 +201,14 @@ router.post(
   "/jobs/ghl-sync",
   requireKey(true),
   wrap(async (req, res) => {
-    if (!ghlConfigured()) return bad(res, "GHL_API_TOKEN غير مضبوط", 503);
+    if (!ghlConfigured()) return bad(res, "مفتاح Dental Shift غير مضبوط (DENTAL_SHIFT_API_TOKEN)", 503);
     const today = todayKey();
     const from = dateKey.safeParse(req.body?.from).data ?? addDays(today, -60);
     const to = dateKey.safeParse(req.body?.to).data ?? addDays(today, 120);
     try {
       res.json(await syncBookings(dayStart(from), dayStart(addDays(to, 1))));
     } catch (err) {
-      bad(res, `فشلت المزامنة مع GHL: ${err instanceof Error ? err.message : err}`, 502);
+      bad(res, `فشلت المزامنة مع Dental Shift: ${err instanceof Error ? err.message : err}`, 502);
     }
   }),
 );

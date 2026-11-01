@@ -41,7 +41,7 @@ export function gradeLabel(score: number | null): string {
 export function tone(score: number | null) {
   if (score == null) return { text: "text-muted", bg: "bg-line", soft: "bg-page", hex: "#a0aab4" };
   if (score >= 85) return { text: "text-good", bg: "bg-good", soft: "bg-good/10", hex: "#1f9d6b" };
-  if (score >= 70) return { text: "text-brand-dark", bg: "bg-brand", soft: "bg-brand/10", hex: "#1691d0" };
+  if (score >= 70) return { text: "text-brand-dark", bg: "bg-brand", soft: "bg-brand/10", hex: "#12b3bd" };
   if (score >= 60) return { text: "text-warn", bg: "bg-warn", soft: "bg-warn/10", hex: "#d98a12" };
   return { text: "text-bad", bg: "bg-bad", soft: "bg-bad/10", hex: "#d64545" };
 }

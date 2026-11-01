@@ -36,7 +36,7 @@ export default function Productivity() {
         <div className="flex justify-center py-20">{loading ? <Spinner /> : null}</div>
       ) : data.totals.bookings === 0 && data.agents.length === 0 ? (
         <Card>
-          <Empty>لا توجد حجوزات في هذه الفترة. شغّل مزامنة GHL من الإعدادات، أو حمّل البيانات التجريبية.</Empty>
+          <Empty>لا توجد حجوزات في هذه الفترة. شغّل مزامنة Dental Shift من الإعدادات، أو حمّل البيانات التجريبية.</Empty>
         </Card>
       ) : (
         <>
@@ -59,7 +59,7 @@ export default function Productivity() {
               <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warn" />
               <div>
                 <b className="tabular">{data.unassigned.bookings}</b> حجز ({data.unassigned.share}٪) بدون اسم موظفة — حجزتها موظفات
-                موجودات في DentalTap وليس لهن حساب في GHL. أضف حساباتهن في GHL لتُنسب حجوزاتهن لهن.
+                موجودات في DentalTap وليس لهن حساب في Dental Shift. أضف حساباتهن في Dental Shift لتُنسب حجوزاتهن لهن.
               </div>
             </div>
           ) : null}
@@ -124,7 +124,7 @@ export default function Productivity() {
             <div className="flex flex-wrap gap-x-4 gap-y-1 px-4 py-2 text-[11px] text-muted">
               <span>نسبة الحضور = حضر ÷ (حضر + لم يحضر)</span>
               <span>تحويل التواصل = الحجوزات ÷ (المكالمات + الشات الوارد)</span>
-              <span>الحجوزات محسوبة بتاريخ إنشاء الحجز، وحالتها من GHL</span>
+              <span>الحجوزات محسوبة بتاريخ إنشاء الحجز، وحالتها من Dental Shift</span>
             </div>
           </Card>
 
@@ -132,7 +132,7 @@ export default function Productivity() {
             <div className="flex items-start gap-2 rounded-2xl bg-brand/5 p-3 text-sm text-ink">
               <Info className="mt-0.5 size-4 shrink-0 text-brand" />
               أعداد المكالمات والشات الواردة ستظهر بعد ربط اتصالنا وrespond.io (عبر Zapier إلى ‎/api/qa/volume‎). الحجوزات
-              والحضور تعمل الآن من GHL.
+              والحضور تعمل الآن من Dental Shift.
             </div>
           ) : null}
 
@@ -170,7 +170,7 @@ export function FunnelBar({ row }: { row: Pick<ProductivityRow, "bookings" | "sh
   return (
     <div className="flex h-2.5 w-36 overflow-hidden rounded-full bg-page">
       {seg(row.showed, "#1f9d6b", "حضر")}
-      {seg(row.upcoming, "#87b3d4", "قادم")}
+      {seg(row.upcoming, "#9fdde2", "قادم")}
       {seg(row.noshow, "#d64545", "لم يحضر")}
       {seg(row.cancelled, "#d98a12", "ألغى")}
     </div>
@@ -186,7 +186,7 @@ function DailyBars({ data }: { data: P["daily"] }) {
     <div>
       <div className="mb-2 flex min-h-5 flex-wrap items-center gap-3 text-xs text-muted">
         <Legend color="#1f9d6b" label="حضر" />
-        <Legend color="#87b3d4" label="قادم" />
+        <Legend color="#9fdde2" label="قادم" />
         <Legend color="#d64545" label="لم يحضر" />
         <Legend color="#d98a12" label="ألغى" />
         {h ? (
@@ -205,7 +205,7 @@ function DailyBars({ data }: { data: P["daily"] }) {
             >
               {[
                 [d.showed, "#1f9d6b"],
-                [d.upcoming, "#87b3d4"],
+                [d.upcoming, "#9fdde2"],
                 [d.noshow, "#d64545"],
                 [d.cancelled, "#d98a12"],
               ].map(([n, c]) =>
@@ -235,9 +235,9 @@ function Legend({ color, label }: { color: string; label: string }) {
 function SourceSplit({ data }: { data: P }) {
   const staff = data.totals.bookings - data.online.bookings - data.unassigned.bookings;
   const items = [
-    { label: "موظفات", n: staff, color: "#1691d0" },
-    { label: "بدون اسم (غير مضافات في GHL)", n: data.unassigned.bookings, color: "#d98a12" },
-    { label: "حجز أونلاين", n: data.online.bookings, color: "#26717e" },
+    { label: "موظفات", n: staff, color: "#12b3bd" },
+    { label: "بدون اسم (غير مضافات في Dental Shift)", n: data.unassigned.bookings, color: "#d98a12" },
+    { label: "حجز أونلاين", n: data.online.bookings, color: "#0e5c63" },
   ];
   const total = Math.max(1, data.totals.bookings);
   return (

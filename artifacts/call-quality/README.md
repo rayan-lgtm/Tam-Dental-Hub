@@ -148,7 +148,7 @@ Content-Type: application/json
 | `QA_ADMIN_KEY` | مفتاح دخول لوحة المتابعة |
 | `QA_INGEST_KEY` | مفتاح للأنظمة الخارجية (ingest + الجدولة اليومية) فقط |
 | `ELEVENLABS_API_KEY` | اختياري — لتفريغ تسجيلات المكالمات |
-| `GHL_API_TOKEN` | Private Integration Token من GHL بصلاحيات **قراءة فقط**: `calendars.readonly`, `calendars/events.readonly`, `users.readonly` — للحجوزات والحضور |
+| `DENTAL_SHIFT_API_TOKEN` | Private Integration Token من GHL بصلاحيات **قراءة فقط**: `calendars.readonly`, `calendars/events.readonly`, `users.readonly` — للحجوزات والحضور |
 | `GHL_SALES_CALENDAR_ID` / `GHL_ORGANIC_CALENDAR_ID` / `GHL_ONLINE_USER_ID` / `GHL_SYSTEM_USER_ID` | اختياري — القيم الافتراضية مضبوطة لحساب تام دنتال |
 | `QA_MODEL` | اختياري — الافتراضي `claude-opus-5-5` |
 | `QA_EFFORT` | اختياري — `low` / `medium` (افتراضي) / `high` |

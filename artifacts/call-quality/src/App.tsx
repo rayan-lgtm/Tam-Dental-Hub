@@ -86,12 +86,12 @@ export default function App() {
 
   return (
     <div className="min-h-dvh">
-      <header className="sticky top-0 z-20 bg-navy text-white">
+      <header className="sticky top-0 z-20 border-b-2 border-cyan bg-navy text-white">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
-          <img src={`${import.meta.env.BASE_URL}logo-light.png`} alt="تام دنتال" className="h-8 w-auto" />
+          <img src={`${import.meta.env.BASE_URL}ds-logo-light.png`} alt="Dental Shift" className="h-7 w-auto" />
           <div className="border-s border-white/20 ps-3">
             <div className="text-sm font-bold">جودة الخدمة والضيافة</div>
-            <div className="text-[11px] text-white/60">تحليل يومي للمكالمات والشات</div>
+            <div className="text-[11px] text-white/60">تام دنتال · تحليل يومي للمكالمات والشات</div>
           </div>
           <button onClick={logout} className="ms-auto rounded-lg p-2 text-white/70 hover:bg-white/10" title="خروج">
             <LogOut className="size-4" />
@@ -106,7 +106,7 @@ export default function App() {
                 key={n.page}
                 href={`#/${n.path}`}
                 className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                  active ? "bg-white text-navy" : "text-white/75 hover:bg-white/10"
+                  active ? "bg-cyan text-navy" : "text-white/75 hover:bg-white/10"
                 }`}
               >
                 <n.icon className="size-4" />

@@ -27,9 +27,9 @@ export default function Login({ onDone }: { onDone: () => void }) {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-navy px-4">
       <form onSubmit={submit} className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-xl">
-        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="تام دنتال" className="mx-auto h-12 w-auto" />
+        <img src={`${import.meta.env.BASE_URL}ds-logo.png`} alt="Dental Shift" className="mx-auto h-10 w-auto" />
         <h1 className="mt-4 text-center text-lg font-bold">لوحة جودة الخدمة</h1>
-        <p className="mt-1 text-center text-sm text-muted">متابعة يومية لأداء موظفات الاتصال والشات</p>
+        <p className="mt-1 text-center text-sm text-muted">تام دنتال · متابعة يومية لأداء موظفات الاتصال والشات</p>
         <label className="mt-6 block text-xs font-semibold text-muted">مفتاح الدخول</label>
         <div className="relative mt-1">
           <KeyRound className="absolute end-3 top-2.5 size-4 text-muted" />

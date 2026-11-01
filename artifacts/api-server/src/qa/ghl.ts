@@ -26,17 +26,19 @@ export const GHL = {
   systemUserId: process.env["GHL_SYSTEM_USER_ID"] ?? "Xvx6gbS9t5XudJF27PTH",
 };
 
-export const ghlConfigured = () => !!process.env["GHL_API_TOKEN"];
+/** Dental Shift CRM token (read-only). GHL_API_TOKEN still accepted for compatibility. */
+const token = () => process.env["DENTAL_SHIFT_API_TOKEN"] ?? process.env["GHL_API_TOKEN"];
+export const ghlConfigured = () => !!token();
 
 async function ghl<T>(path: string, version: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     headers: {
-      Authorization: `Bearer ${process.env["GHL_API_TOKEN"]}`,
+      Authorization: `Bearer ${token()}`,
       Version: version,
       Accept: "application/json",
     },
   });
-  if (!res.ok) throw new Error(`GHL ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  if (!res.ok) throw new Error(`Dental Shift ${res.status}: ${(await res.text()).slice(0, 200)}`);
   return (await res.json()) as T;
 }
 
