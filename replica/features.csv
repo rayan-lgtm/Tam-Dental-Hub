@@ -1,49 +1,49 @@
 feature,area,priority,original,clone,notes
-Lab staff sign in with roles and permissions,auth,must,yes,no,help: granting user access and permissions
-Multi-lab tenancy (each lab sees only its data),platform,must,yes,no,cloud SaaS
-Create a case: client doctor patient pan # due date,case entry,must,yes,no,help: case entry
-Case items with product teeth shade material qty,case entry,must,yes,no,
-Tooth chart picker (FDI and Universal),case entry,must,yes,no,FDI matters outside the US
-Attach scans and photos to a case,files,must,yes,no,STL/PLY/OBJ + images; large files
-Case record with items files notes and history,case record,must,yes,no,help: case record
-Case notes,case record,must,yes,no,help: adding case notes
-Case flags (rush on hold remake...),case record,must,yes,no,help: defining case flags
-Void a case and keep its history,case record,must,yes,no,help: voiding a case
-Case search by pan # patient doctor or barcode,cases,must,yes,no,
-Production dashboard: due today overdue by status,dashboard,must,yes,no,real-time overview of cases and deadlines
-Product catalog with turnaround days,settings,must,yes,no,Settings > product catalog
-Production route per product (multi-step),production,must,yes,no,Premium: multi-step production lines
-Barcode on every case and printed work ticket,production,must,yes,no,integrated barcoding
-Scan to check a case in/out of a step,production,must,yes,no,
-Due list (printable) and batch shipping with tracking #,shipping,must,yes,no,
-Clients and doctors,clients,must,yes,no,
-Price book per client,billing,must,yes,no,help: price management
-Invoice created on ship (one click),billing,must,yes,no,
-Record payments and apply them to invoices,billing,must,yes,no,
-Doctor portal: list and track own cases,portal,must,yes,no,
-Doctor portal: submit a digital Rx with file upload,portal,must,yes,no,online Rx
-Digital intake inbox to accept incoming orders,intake,must,yes,no,LMS auto-creates cases from scans
-Monthly statements per client,billing,should,yes,no,
+Lab staff sign in with roles and permissions,auth,must,yes,yes,help: granting user access and permissions; app: users + categories + per-module permissions
+Multi-lab tenancy (each lab sees only its data),platform,must,yes,no,cloud SaaS; app: no lab_id anywhere; single lab only
+Create a case: client doctor patient pan # due date,case entry,must,yes,yes,help: case entry; 
+Case items with product teeth shade material qty,case entry,must,yes,yes,app: material not separate; design/features fields
+Tooth chart picker (FDI and Universal),case entry,must,yes,partial,FDI matters outside the US; app: FDI only
+Attach scans and photos to a case,files,must,yes,partial,STL/PLY/OBJ + images; large files; app: STL/PLY/OBJ/ZIP rejected; 10MB cap; local disk storage
+Case record with items files notes and history,case record,must,yes,yes,help: case record; app: case-detail-sheet
+Case notes,case record,must,yes,yes,help: adding case notes; 
+Case flags (rush on hold remake...),case record,must,yes,yes,help: defining case flags; app: colour flags
+Void a case and keep its history,case record,must,yes,yes,help: voiding a case; 
+Case search by pan # patient doctor or barcode,cases,must,yes,yes,
+Production dashboard: due today overdue by status,dashboard,must,yes,yes,real-time overview of cases and deadlines; 
+Product catalog with turnaround days,settings,must,yes,yes,Settings > product catalog; 
+Production route per product (multi-step),production,must,yes,yes,Premium: multi-step production lines; app: product_steps with days + default technician
+Barcode on every case and printed work ticket,production,must,yes,partial,integrated barcoding; app: work-order returns pan/ref as barcode; no scan flow
+Scan to check a case in/out of a step,production,must,yes,no,app: only completed-step logs; no current step
+Due list (printable) and batch shipping with tracking #,shipping,must,yes,partial,app: delivery batches with driver; no tracking #
+Clients and doctors,clients,must,yes,yes,
+Price book per client,billing,must,yes,yes,help: price management; app: price lists per client
+Invoice created on ship (one click),billing,must,yes,partial,app: manual from-case invoice; not automatic
+Record payments and apply them to invoices,billing,must,yes,yes,"app: + wallet, credit/debit notes"
+Doctor portal: list and track own cases,portal,must,yes,partial,"app: matched by doctor name text, not dentist id"
+Doctor portal: submit a digital Rx with file upload,portal,must,yes,partial,online Rx; app: no file upload from portal
+Digital intake inbox to accept incoming orders,intake,must,yes,yes,LMS auto-creates cases from scans; app: portal submissions tab
+Monthly statements per client,billing,should,yes,yes,
 Doctor portal: view invoices and statements,portal,should,yes,no,
-Doctor portal: pay by card,portal,should,yes,no,LabStar used WePay; use Stripe or a local gateway
+Doctor portal: pay by card,portal,should,yes,no,LabStar used WePay; use Stripe or a local gateway; 
 Doctor portal: print slip for a physical impression,portal,should,yes,no,
-Per-case messaging between lab and doctor,messaging,should,yes,no,Unite order chat; LabStar secure messaging
+Per-case messaging between lab and doctor,messaging,should,yes,partial,Unite order chat; LabStar secure messaging; app: lab side only; no portal endpoint
 Production board by department technician or step,production,should,yes,no,
-Production traceability (who did which step when),production,should,yes,no,Premium
-Remake tracking with reason and who pays,production,should,yes,no,
+Production traceability (who did which step when),production,should,yes,yes,Premium; app: production logs per step/technician
+Remake tracking with reason and who pays,production,should,yes,partial,app: REMAKE type + parent case; no reason/who pays
 Carrier tracking links for doctors,shipping,should,yes,no,UPS/FedEx in the US; use local carriers
-Email notifications on status changes,notifications,should,yes,no,
+Email notifications on status changes,notifications,should,yes,partial,app: invoice email only
 In-browser 3D scan preview,files,should,yes,no,
-Departments and technician assignment,settings,should,yes,no,
-Client credit notes and refunds,billing,should,yes,no,
-Business reports (sales by client product period),reports,should,yes,no,
+Departments and technician assignment,settings,should,yes,yes,app: technician-step assignments + capacity
+Client credit notes and refunds,billing,should,yes,yes,
+Business reports (sales by client product period),reports,should,yes,yes,"app: aging, on-time, productivity, remake, void, by client/product"
 Accounting export (QuickBooks or CSV),billing,could,yes,no,
-Technician productivity report,reports,could,yes,no,
-Case scheduling and capacity planning,production,could,yes,no,LabStar 2.0: case scheduling
+Technician productivity report,reports,could,yes,yes,
+Case scheduling and capacity planning,production,could,yes,yes,LabStar 2.0: case scheduling; app: calculate-schedule with capacity
 CRM: sales notes and follow-ups on clients,clients,could,yes,no,LabStar 2.0: CRM
 Mobile app for status and scanning,mobile,could,yes,no,
-Arabic/English UI with RTL,platform,could,no,no,our addition for the Gulf market
-ZATCA e-invoicing (Saudi Arabia),billing,could,no,no,our addition; a must if selling in KSA
+Arabic/English UI with RTL,platform,could,no,yes,our addition for the Gulf market; 
+ZATCA e-invoicing (Saudi Arabia),billing,could,no,partial,our addition; a must if selling in KSA; app: validation + clearance built; production onboarding unverified
 Subscription billing for the labs themselves,platform,could,yes,no,
 TRIOS / Dental System native integration,integrations,could,yes,skip,3Shape's closed link; use file upload and public APIs only
 Unite lab directory (1000+ labs),network,could,yes,skip,their network not their product
